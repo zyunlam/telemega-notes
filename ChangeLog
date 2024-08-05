@@ -1,5 +1,301 @@
+commit 895665eefe846394926d70e4a5d51346841cb251
+Merge: 5d0a76157 36f3368a6
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Aug 5 10:37:52 2024 -0600
+
+    Merge branch 'master' into branch-1.9
+
+commit 36f3368a6dfc61e4391719559efadaac19a566fc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 2 08:58:44 2024 -0700
+
+    Version 1.9.19
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit fc66c028ff6945edf5aa99d47c21c02a89093e96
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 2 08:57:39 2024 -0700
+
+    Add easymega v3.0 firmware to fat images
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3d3505186ff0eff219c3c4326288181f4f6f95e1
+Author: Keith Packard <keithp@keithp.com>
+Date:   Fri Aug 2 08:53:56 2024 -0700
+
+    doc: Version 1.9.19 release notes
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit d5b471c360fc57f924e37e1d4844bb8960470d21
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Aug 2 10:26:43 2024 -0600
+
+    capture link for EasyMini production scripts
+
+commit 44066a8c77cd3b40bba3c58a2b2e5001a8fe99bf
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Fri Aug 2 10:25:15 2024 -0600
+
+    production bench scripts for EasyMega v3
+
+commit e421a62342e3dde9210663d6c8b81e5ee22fe4df
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed May 29 13:54:06 2024 -0600
+
+    make EasyMini v2.1 our "current" thing to flash/cal/test
+
+commit 6f4f9015612a18406de7c80e9c4a72544fccc35e
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 31 13:12:04 2024 -0700
+
+    ao-accel-cal: Validate ADXL375 sensitivity
+    
+    If the accel device is an ADXL375, make sure the Z axis sensitivity is
+    within the data sheet range of 18.4 to 22.6 g. Allow for rounding as the
+    device only records the integer value (sigh).
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 7da6e6eb53154a8d94513cb4ddb570949ff5d1c9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jul 31 12:06:43 2024 -0700
+
+    src: Open up the ADXL375 self test range
+    
+    Reading the datasheet more carefully, we discover that it mentions
+    that the self test magnitude can vary within a rather wide range.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 259dbc4202b8980a6983deaa7187188d5cbbca41
+Merge: 955c49611 2009090f5
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jul 31 12:01:27 2024 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit 955c49611be14868252b496fd458f2dc4ab74c2b
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Wed Jul 31 12:01:00 2024 -0600
+
+    include EasyMega v3 firmware in that captured in LLC repo during release
+
+commit 2009090f5a6eed5ecdb59ba0cd6f614f93f327bd
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat Jul 27 14:59:39 2024 -0700
+
+    ao-bringup: Re-add cal-freq
+    
+    This got deleted by mistake
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 28a42c348d1ec584d0dcdb20cc6ff243aea7575c
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 16 17:49:31 2024 -0600
+
+    doc: reflect move of mailing list from lists.gag.com to groups.io
+
+commit 6db5b9a1a56073d2942a36854fdcff633dfb7aa0
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 16 17:44:51 2024 -0600
+
+    doc: EasyTimer v2.0 also has mag sensor
+
+commit 68f6a5c6d23658c41950ccf0c7533ea0f4cb6a04
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jul 16 17:41:32 2024 -0600
+
+    docs: correct EasyMotor v3.0 battery in specs table
+
+commit 34fe19d319c8e178171b9d8cc0e6acbf0495c5a9
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Tue Jun 25 12:11:31 2024 -0600
+
+    doc: clarify how EasyMotor gets put into idle mode
+
+commit f8527ffca57c7c7dad33c5788b8a060da84280c9
+Merge: a41cae3fd 3bc1ab004
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jun 24 09:03:17 2024 -0600
+
+    Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
+
+commit a41cae3fd90509d272146493dd7812e28df0f333
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Jun 24 09:02:46 2024 -0600
+
+    doc: add Terry Lee's TRA and NAR numbers to TeleLaunch doc as his request
+
+commit 3bc1ab0046c4dbebbde8557d3a1f45707aaefa42
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 20 15:35:38 2024 -0700
+
+    altoslib: Check for negative tick wrap when importing flight records
+    
+    If the tick count wraps just as boost is detected, there may be some
+    data records on the device with large tick values which are recorded
+    after the AO_FLIGHT record. Check for these in two places which manage
+    16-bit tick values by wrapping tick values to negative numbers in
+    those cases.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 3e2cadd282479e21ce74f80e4fe844f65db16bab
+Author: Keith Packard <keithp@keithp.com>
+Date:   Thu Jun 20 15:34:44 2024 -0700
+
+    altosui: Don't add pyro table to graph UI when npyro == MISSING
+    
+    For some reason, npyro is set to MISSING in some flight records. Check
+    for that before adding pyro info.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit ff6116f1a65a1a623a5b00759e5b922c3f482278
+Author: Keith Packard <keithp@keithp.com>
+Date:   Wed Jun 19 23:02:30 2024 -0700
+
+    telelco-v3.0: Support ambient light sensor
+    
+    A TEPT5700 ALS and 15k resistor from 3.3V to ground hooked to ADC10 on
+    PC0.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 18f3c100b7073bd9aeaedfacc25324a7771b0723
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 11 20:53:25 2024 -0700
+
+    altos/telelco-v3.0: Merge info into one screen
+    
+    Move all of the info bits from separate screens to a single
+    screen. Eliminate the contrast screen, plan on eliminating the
+    backlight screen once we've switched to an ALS.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 14f82893c918d224f28a79211840a5523684fedc
+Author: Keith Packard <keithp@keithp.com>
+Date:   Tue Jun 11 16:26:16 2024 -0700
+
+    altos/telelco-v3.0: Swap version and serial on info page
+    
+    Rationale is that model and sn are part of the hardware, version is
+    fw, call and freq are config.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 04469f35a791b34b95145e222384f0a4661f10e4
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 10 14:31:11 2024 -0700
+
+    altos/telelco-v3.0: Display good vs bad packets received
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 934301ca378192aecbaacf345cdb76a4d96c269d
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 10 13:47:41 2024 -0700
+
+    altos/telelco-v3.0: Add "Scanning..." to startup screen
+    
+    Make it clear what's going on. Had to shrink the logo to make room, so
+    switched from 26 to 24 point text.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 45bcdbdb5c4709646416857c5db7e7f29780b674
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 10 13:37:47 2024 -0700
+
+    altos/telelco-v3.0: Delete debug code
+    
+    Remove the display debugging code which is no longer used.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 1200e0c549c4b7e3b40d270879af4180cdd5f689
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon Jun 10 13:31:05 2024 -0700
+
+    src/telelco-v3.0: Increase LED test time to 1 second
+    
+    Make it possible to verify all LEDs active during testing.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit bf1e38a6f085c630cf56c3da44fc6d4eb232e373
+Author: Keith Packard <keithp@keithp.com>
+Date:   Mon May 20 21:22:33 2024 -0700
+
+    altos/easymega-v3.0: Add combined dfu and ihx targets
+    
+    Build these for testing the boards at Seeed
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 2830a47f142e79b8e4435f3957f19c7858606cd9
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat May 11 19:03:51 2024 -0700
+
+    altosui: Add config and pyro tabs to graph widget
+    
+    Show the flight computer configuration in the graph when available.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 407086a6b36032f0c780d3b3e94101fa96a1c900
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sat May 11 17:52:20 2024 -0700
+
+    altos/test: Get the flight software test code working again
+    
+    This had gotten very stale; much hacking was required. I know the
+    TeleMega v4 code works, other things "might". At least it seems to
+    build without errors?
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit db58d8c58fd6dcb4d153d85e3fd37d59956c84db
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 29 11:41:48 2024 -0600
+
+    first cut at turnon scripts for EasyTimer v2
+
+commit 0d8c2354e7c4f7d2671e6c0a0d088fd94de75c46
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Mon Apr 29 11:20:53 2024 -0600
+
+    remove garbage line from easymotor turnon script
+
+commit 5de98063f8e638e18ea0f05f09e31e435dfd7d0a
+Author: Keith Packard <keithp@keithp.com>
+Date:   Sun Apr 28 21:19:58 2024 -0700
+
+    altos/easymini-v2.0: Remove combined .dfu file
+    
+    This is delivered to seeed for testing the hardware.
+    
+    Signed-off-by: Keith Packard <keithp@keithp.com>
+
+commit 673d326fd861672feaee7c903486e54e8de9471d
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 28 20:44:55 2024 -0600
+
+    capture things learned during 1.9.18 release
+
+commit 5d0a76157ae14b6cc8ff9236db4960dc475905db
+Author: Bdale Garbee <bdale@gag.com>
+Date:   Sun Apr 28 19:40:41 2024 -0600
+
+    update ChangeLog for 1.9.18 release
+
 commit d8a81e14d572c4fa8d1b5aa7cb477654c206ae1d
-Merge: 1311eba0 dce00ba4
+Merge: 1311eba0b dce00ba45
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Apr 28 19:40:16 2024 -0600
 
@@ -32,7 +328,7 @@ Date:   Sun Apr 28 18:34:30 2024 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1311eba0bbe32bc1759a3b11b00c78774843383c
-Merge: 7b2588ee a0005e3f
+Merge: 7b2588ee7 a0005e3f0
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Apr 28 18:44:32 2024 -0600
 
@@ -1093,7 +1389,7 @@ Date:   Mon Dec 11 13:44:54 2023 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 83953c145483f4902e31e22062e9261de4c97aa6
-Merge: 7cb9bbe7 960603c4
+Merge: 7cb9bbe7a 960603c4a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Nov 16 09:28:44 2023 -0700
 
@@ -1145,7 +1441,7 @@ Date:   Wed Aug 30 10:48:52 2023 -0600
     update ChangeLog for 1.9.17 release
 
 commit 63a8707ee4120148f6ec5cb073b349beefe377fa
-Merge: b071450f a4995df3
+Merge: b071450f0 a4995df3d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 30 10:46:42 2023 -0600
 
@@ -1315,7 +1611,7 @@ Date:   Thu Apr 27 23:53:30 2023 -0600
     updte ChangeLog for 1.9.16 release
 
 commit 1605f722a7e0b2ba54620ce334e79374842e6957
-Merge: 459f421a 58fa3379
+Merge: 459f421aa 58fa33796
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Apr 27 23:52:46 2023 -0600
 
@@ -1369,7 +1665,7 @@ Date:   Wed Apr 26 17:06:42 2023 -0600
     add production scripts for TeleGPS v3.0
 
 commit 1ab3cdedb83296a3296aeaaf1e0fa6a11800e331
-Merge: 90256e02 38450798
+Merge: 90256e02c 384507982
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Apr 26 15:46:15 2023 -0700
 
@@ -1909,7 +2205,7 @@ Date:   Sun Feb 19 18:26:57 2023 -0700
     releasing 1.9.15
 
 commit 38fac9fd1ebdc0900f598c859453b5fc8fc6b4a6
-Merge: 94fdc596 6f1686d7
+Merge: 94fdc596e 6f1686d7a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Feb 19 18:24:56 2023 -0700
 
@@ -1989,7 +2285,7 @@ Date:   Thu Feb 16 15:05:27 2023 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit d5d835d65e909de24538ee0edb37d0ad0877f0c6
-Merge: 4591878f 7e696108
+Merge: 4591878f7 7e6961085
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Feb 16 15:52:56 2023 -0700
 
@@ -2030,7 +2326,7 @@ Date:   Tue Feb 14 19:00:29 2023 -0700
     altos: re-number csm85clio outputs 0..49 to match schematic and silkscreen
 
 commit 7b24be27f67f95d909d19d767e4ac5376ea670cf
-Merge: 58d13bd9 36ef74a9
+Merge: 58d13bd9b 36ef74a9c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Feb 10 06:52:43 2023 -0700
 
@@ -2078,7 +2374,7 @@ Date:   Thu Feb 2 12:53:51 2023 -0700
     ChangeLog for releas 1.9.14
 
 commit 0d34cacb37ad37208bd0602364a0be660ddd12bc
-Merge: e6a83e73 360aa73c
+Merge: e6a83e73b 360aa73ce
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Feb 2 12:52:01 2023 -0700
 
@@ -2152,14 +2448,14 @@ Date:   Thu Jan 19 22:57:39 2023 -0700
     releasing 1.9.13
 
 commit 8e42773e7834638464b46495123dbdc2356032bf
-Merge: a6c32739 7fe1408a
+Merge: a6c32739c 7fe1408af
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Jan 19 22:55:56 2023 -0700
 
     Merge branch 'master' into branch-1.9
 
 commit 7fe1408af6fd65c13cebf33d7bb7bf8517d8ce1e
-Merge: 234b275d 5f007934
+Merge: 234b275db 5f007934c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Jan 19 22:51:27 2023 -0700
 
@@ -2266,7 +2562,7 @@ Date:   Thu Jan 19 13:20:56 2023 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7b40813fdafce4ebd635aceb4c32355339a4d98d
-Merge: 026ab589 4c61c113
+Merge: 026ab589d 4c61c1132
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jan 19 12:21:32 2023 -0800
 
@@ -2462,7 +2758,7 @@ Date:   Sat Nov 26 09:57:33 2022 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit c1708f3fa4ff412da8817ba0fa58d05fe7ef44f5
-Merge: 414ad269 999cc72a
+Merge: 414ad2696 999cc72af
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Nov 26 09:52:37 2022 -0800
 
@@ -2701,7 +2997,7 @@ Date:   Thu Nov 10 11:40:29 2022 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 53a9d3b3c2d9fb04d8f5fba42ce19cd13dc65f28
-Merge: 31f32f20 543b6d08
+Merge: 31f32f200 543b6d086
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Nov 10 12:34:49 2022 -0700
 
@@ -3067,7 +3363,7 @@ Date:   Fri Nov 4 02:56:31 2022 -0600
     ao-bringup: final production test script for EasyMotor v3
 
 commit a2fdfd4f9c92c1d3331f8be0e15ae19209b4ee15
-Merge: 28fd8e6f 4a1f441b
+Merge: 28fd8e6f1 4a1f441b7
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Nov 4 02:41:43 2022 -0600
 
@@ -3092,7 +3388,7 @@ Date:   Fri Nov 4 02:39:34 2022 -0600
     ao-tools: don't do 'm 0' after 'E 0' since EasyMotor doesn't support it
 
 commit 4a1f441b746d4c9d1cb4a52401d76b5e81ba6f48
-Merge: e5feac1a d80c1317
+Merge: e5feac1a3 d80c1317f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Nov 2 11:34:35 2022 -0600
 
@@ -3133,7 +3429,7 @@ Date:   Fri Oct 28 23:10:24 2022 -0600
     updating changelog for 1.9.12 release
 
 commit bdabc6814b066a9b17a6557910f21b1ed03de3f0
-Merge: 37dda254 c5e8826a
+Merge: 37dda2541 c5e8826aa
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Oct 28 23:10:00 2022 -0600
 
@@ -3204,7 +3500,7 @@ Date:   Thu Oct 27 22:20:19 2022 -0600
     fix mailing list reference to use mailman3 path
 
 commit 975e3133e25c6fb5ea0c0b2487ea34e528660a45
-Merge: 05278307 bda33b76
+Merge: 05278307f bda33b769
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Oct 28 21:49:16 2022 -0600
 
@@ -3288,7 +3584,7 @@ Date:   Thu Oct 27 19:19:59 2022 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 611ef4497b97bcf5239d6bc2ee13eeba9efd1503
-Merge: 1e694ad4 083464b5
+Merge: 1e694ad4f 083464b52
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 27 19:16:39 2022 -0700
 
@@ -3616,7 +3912,7 @@ Date:   Sun May 29 21:08:03 2022 -0600
     releasing 1.9.11
 
 commit 7904b36eaae2468d76f2627bebd86b663afea1f8
-Merge: 8970d45e 4e237bd4
+Merge: 8970d45ea 4e237bd43
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun May 29 21:07:44 2022 -0600
 
@@ -3773,14 +4069,14 @@ Date:   Wed Apr 6 22:14:32 2022 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit c49bd3cb0c31a51fae79ddc92237cc309be9a242
-Merge: d225adc3 b140da92
+Merge: d225adc3a b140da925
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Apr 6 22:51:13 2022 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
 commit b140da92536d7c48ba37868f1c2afce7bb86dfdb
-Merge: 1d208c95 302e9b8f
+Merge: 1d208c950 302e9b8fd
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Apr 5 17:55:06 2022 -0600
 
@@ -3938,7 +4234,7 @@ Date:   Sun Feb 27 16:10:30 2022 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit d225adc3af9e5726d436cbbdbf8dcc5837e50804
-Merge: 3759d670 85dd82b2
+Merge: 3759d6707 85dd82b20
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Apr 4 01:22:04 2022 -0600
 
@@ -4694,7 +4990,7 @@ Date:   Wed Dec 22 11:35:52 2021 -0700
     doc: add an appendix on frequency calibration to the all-in-one manual
 
 commit 66152b176bad12fbff3188397c607793c0bdd380
-Merge: 8e1145b9 0921e8b1
+Merge: 8e1145b98 0921e8b16
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Dec 20 13:49:41 2021 -0700
 
@@ -4707,7 +5003,7 @@ Date:   Mon Dec 20 13:49:28 2021 -0700
     need to capture .bin file for telebt loader, too
 
 commit 0921e8b166c41ea8f65df14cea893481d8e1f0f1
-Merge: 236d80fa 9db486f6
+Merge: 236d80fac 9db486f6d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Nov 3 13:24:41 2021 -0600
 
@@ -4764,7 +5060,7 @@ Date:   Sun Oct 10 21:42:19 2021 -0600
     releasing 1.9.10
 
 commit ed267e76eb03c34ec233c33a002ec9e5e53ec83a
-Merge: bd71c839 ef70f80b
+Merge: bd71c839b ef70f80b3
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Oct 10 21:41:50 2021 -0600
 
@@ -4849,7 +5145,7 @@ Date:   Thu Oct 7 22:45:37 2021 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 236d80fac2b4293c5750c9d80b387afd4d0fc5cc
-Merge: 047a3f1f 6ef22682
+Merge: 047a3f1f0 6ef226822
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Oct 7 12:11:06 2021 -0600
 
@@ -4873,7 +5169,7 @@ Date:   Thu Oct 7 00:00:42 2021 -0600
     releasing 1.9.9
 
 commit 2f1d5b25e72324512238920b45e864bf7c5d16fe
-Merge: c0fe810e 6ef22682
+Merge: c0fe810e9 6ef226822
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Oct 6 23:59:20 2021 -0600
 
@@ -4954,7 +5250,7 @@ Date:   Mon Sep 20 20:23:10 2021 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 047a3f1f08687113b80123cc7568d7057a23bcc3
-Merge: 01b5d271 e7a19e6d
+Merge: 01b5d271d e7a19e6de
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 22 11:53:17 2021 -0600
 
@@ -4991,7 +5287,7 @@ Date:   Mon Sep 20 21:25:42 2021 -0600
     update ChangeLog for 1.9.8 release
 
 commit 47e98987fd8789583406eba7d2bc2d47bfad1f11
-Merge: 7d52b911 fbf4b677
+Merge: 7d52b9117 fbf4b6778
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 20 21:24:45 2021 -0600
 
@@ -5351,7 +5647,7 @@ Date:   Tue Aug 17 20:02:05 2021 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit ea380005c74ba2ea9738de1d909b5650b2f44706
-Merge: cee8c407 b6619833
+Merge: cee8c407b b6619833a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Aug 28 13:16:45 2021 -0600
 
@@ -5514,7 +5810,7 @@ Date:   Tue Jun 8 22:56:37 2021 -0600
     update ChangeLog for 1.9.7 release
 
 commit 8750dde659cec836fa6354651d5967b7aac1dff0
-Merge: dcd1feb8 24215a4a
+Merge: dcd1feb83 24215a4a2
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jun 8 22:56:04 2021 -0600
 
@@ -5571,7 +5867,7 @@ Date:   Tue May 11 22:28:32 2021 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 76847aadc1ea770099c6be05727dfa232e53205c
-Merge: daa635de 7643f408
+Merge: daa635de7 7643f4088
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Jun 7 17:11:01 2021 -0600
 
@@ -5654,7 +5950,7 @@ Date:   Tue May 18 23:26:12 2021 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit daa635de77da3a1926ceb2e2d91e31ec169e173c
-Merge: a2e71a40 362f11ff
+Merge: a2e71a40e 362f11fff
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue May 18 23:54:48 2021 -0600
 
@@ -5746,7 +6042,7 @@ Date:   Mon Apr 12 18:36:45 2021 -0600
     ao-bringup: add tools for flash/cal/test of EasyMotor v2
 
 commit 1451e2fd2092d720b0d49b93ac01bed7e88b831f
-Merge: 9c26fe3e b115522c
+Merge: 9c26fe3e4 b115522c4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Apr 12 18:27:17 2021 -0600
 
@@ -5949,7 +6245,7 @@ Date:   Sat Nov 21 11:22:01 2020 -0700
     doc: add documentation on how to re-flash a TeleMini v3 over USB
 
 commit 6550585af6d80306d037661be66004ccf8d09013
-Merge: c992792b 42226344
+Merge: c992792ba 42226344f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Nov 21 11:00:43 2020 -0700
 
@@ -6164,7 +6460,7 @@ Date:   Thu Oct 22 16:19:33 2020 -0600
     releaseing 1.9.6
 
 commit 38bcc2b8b2b560271902eb8a3eba467866a38628
-Merge: 628da1fe c16cb712
+Merge: 628da1fe4 c16cb712f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Oct 22 16:17:33 2020 -0600
 
@@ -6636,7 +6932,7 @@ Date:   Wed Sep 30 00:18:31 2020 -0600
     releasing 1.9.5
 
 commit f763dfe6a684a16ec40503149adefdc074a63ad0
-Merge: bfe338d1 a1779f94
+Merge: bfe338d11 a1779f944
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 30 00:17:03 2020 -0600
 
@@ -7320,7 +7616,7 @@ Date:   Tue Jul 28 23:40:36 2020 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 3058ecdeafdee959b1103965f3df4ffcd59683e4
-Merge: 0a53faa8 8ec51d69
+Merge: 0a53faa81 8ec51d698
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Jul 22 15:23:02 2020 -0600
 
@@ -7394,7 +7690,7 @@ Date:   Thu Jul 2 20:21:19 2020 -0600
     releasing 1.9.4
 
 commit 8359fcc23a93a37ee3aee4c5d2ef183f18ea3f27
-Merge: b95d6674 9b62f683
+Merge: b95d6674d 9b62f683f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Jul 2 20:20:59 2020 -0600
 
@@ -7463,7 +7759,7 @@ Date:   Mon Jun 15 20:34:50 2020 -0600
     releasing 1.9.3
 
 commit f31d842d0e07a1893441cb89fb287b31b86d28c1
-Merge: 0fd503fb f615725c
+Merge: 0fd503fb6 f615725cb
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Jun 15 20:26:35 2020 -0600
 
@@ -8007,14 +8303,14 @@ Date:   Tue Feb 25 23:57:51 2020 -0700
     update ChangeLog for release 1.9.2
 
 commit 28e77f3520095a1e47ab25721b186e42110ffd3e
-Merge: c6ea2666 91ab3acc
+Merge: c6ea26663 91ab3acc1
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Feb 25 23:57:31 2020 -0700
 
     Merge branch 'master' into branch-1.9
 
 commit 91ab3acc113dc24e1ebce89875def646e590fb12
-Merge: 243a6b5e aae87fe9
+Merge: 243a6b5ee aae87fe9f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Feb 25 23:55:29 2020 -0700
 
@@ -8057,14 +8353,14 @@ Date:   Tue Feb 25 23:18:11 2020 -0700
     update copyright assertion in TeleLaunch manual
 
 commit c6ea266630b9eef7a80e267a4430d22d50954908
-Merge: 12d6b4dc 7d2b2bae
+Merge: 12d6b4dc6 7d2b2bae8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Feb 25 23:17:22 2020 -0700
 
     Merge branch 'master' into branch-1.9
 
 commit 7d2b2bae8a7ed2e15040c58819c8e96215e8292b
-Merge: af8f0b58 0993f791
+Merge: af8f0b589 0993f7913
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Feb 25 22:56:07 2020 -0700
 
@@ -8098,7 +8394,7 @@ Date:   Tue Feb 25 17:07:15 2020 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit af8f0b5892e01bdcf9fa4ca86a4752a8294992a1
-Merge: 25c1ef61 65df207e
+Merge: 25c1ef61b 65df207e0
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Feb 25 22:44:08 2020 -0700
 
@@ -8532,7 +8828,7 @@ Date:   Wed Feb 12 13:01:08 2020 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit cff5506e97314bf9b34d80a01cbdfcad22f3ce08
-Merge: e220b00d 803e260d
+Merge: e220b00d5 803e260dc
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Feb 12 12:55:04 2020 -0700
 
@@ -8755,7 +9051,7 @@ Date:   Wed Feb 5 10:52:05 2020 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit ad947ec3f313bbd1295af5dc64f1af9ec09bfe27
-Merge: 5b1bd4f8 d8e9d152
+Merge: 5b1bd4f87 d8e9d1529
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Feb 5 11:48:13 2020 -0700
 
@@ -8904,7 +9200,7 @@ Date:   Thu Dec 5 22:22:32 2019 -0700
     update ChangeLog for 1.9.1 release
 
 commit fdf1dbd3d945f6f34f404ffbcb57781f4df23015
-Merge: 5b4da841 bfc4999c
+Merge: 5b4da8414 bfc4999c9
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Dec 5 22:21:29 2019 -0700
 
@@ -9249,7 +9545,7 @@ Date:   Wed Sep 18 17:10:14 2019 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 260dd06107c8f8f5c7e606a283d388cb3ba46465
-Merge: 28618a72 faa5abe0
+Merge: 28618a728 faa5abe0b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Sep 18 16:26:44 2019 -0700
 
@@ -10122,7 +10418,7 @@ Date:   Tue Mar 12 12:58:20 2019 +0100
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 3a01a7e36dd475adf96468f42c95aa352b5fdf11
-Merge: 338372b9 6b0754ce
+Merge: 338372b97 6b0754cee
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Mar 5 18:31:37 2019 -0700
 
@@ -10141,7 +10437,7 @@ Date:   Tue Mar 5 17:25:44 2019 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 338372b97d441c30d2a23df540163a66a7f8d8c0
-Merge: 8d0df64b cd920a0e
+Merge: 8d0df64bb cd920a0e5
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Feb 25 18:30:08 2019 -0700
 
@@ -10210,7 +10506,7 @@ Date:   Sun Feb 24 10:25:31 2019 -0700
     altos: first cut at ADS124S0X driver interrupt handling
 
 commit 654a23168f59d04d7e9cad657bebf8ecfdd8e41e
-Merge: d0f66918 655c5d2c
+Merge: d0f669180 655c5d2c1
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Feb 21 21:57:26 2019 -0700
 
@@ -10548,7 +10844,7 @@ Date:   Sun Feb 3 12:48:45 2019 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 145e5a1ac557c4990e74fb64b005fc68d6941bdc
-Merge: e2c9ef80 db730875
+Merge: e2c9ef801 db7308750
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Jan 28 13:46:59 2019 -0700
 
@@ -10688,7 +10984,7 @@ Date:   Thu Jan 3 00:49:22 2019 -0700
     updates to Releasing based on 1.9 release process learnings
 
 commit 5b4da841459a650e641924aab132f566c6259c4d
-Merge: 95ffec07 ecf40a3a
+Merge: 95ffec073 ecf40a3a1
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Jan 2 23:03:41 2019 -0700
 
@@ -10954,7 +11250,7 @@ Date:   Sat Oct 20 07:34:57 2018 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 0686a7b8aec524d81bda4c572549a3a068ce0eed
-Merge: 6aa451ce cc528f1f
+Merge: 6aa451ce8 cc528f1ff
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Oct 20 01:18:12 2018 -0600
 
@@ -11471,7 +11767,7 @@ Date:   Mon Oct 8 16:27:33 2018 -0600
     doc: correct specs for TeleMega v3.0, which still uses the MMA6555
 
 commit 24db798925e26a4c411afe88f7e4844d6554fe0c
-Merge: 6f25d235 03680c55
+Merge: 6f25d2359 03680c55a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Oct 8 16:07:32 2018 -0600
 
@@ -11830,7 +12126,7 @@ Date:   Sat Oct 6 19:27:43 2018 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 073ebc77bbd813eb97c515ecf3c2d104d6157843
-Merge: fb167d9f 9e29ac8e
+Merge: fb167d9f5 9e29ac8ed
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Oct 6 18:55:05 2018 -0600
 
@@ -12890,7 +13186,7 @@ Date:   Mon May 7 11:26:42 2018 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1f56dc30a31e3d5c833f73ec9cd31f548a80e154
-Merge: feb881a2 71acc79f
+Merge: feb881a24 71acc79f8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon May 7 09:53:52 2018 -0700
 
@@ -13480,7 +13776,7 @@ Date:   Sun Mar 18 15:42:48 2018 -0600
     doc: update copyright year in doc/altusmetrum-docinfo.xml
 
 commit 84146083da782c335ba7f040b238c3f51ba2f484
-Merge: ee79a205 78e5ae58
+Merge: ee79a205e 78e5ae58c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Mar 18 15:33:44 2018 -0600
 
@@ -13565,7 +13861,7 @@ Date:   Fri Mar 16 14:49:04 2018 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit ee79a205e118ea8730a02cc327d8fb79cc5f74ff
-Merge: 365eee3e 78a90fc7
+Merge: 365eee3eb 78a90fc76
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Feb 12 16:38:57 2018 -0700
 
@@ -14534,7 +14830,7 @@ Date:   Mon Dec 11 10:17:40 2017 -0700
     TeleMega v3.0 turnon scripts
 
 commit d1d98e408311c5ba18138a18f4c88448e4254626
-Merge: 2f8fce1c abb856cd
+Merge: 2f8fce1cf abb856cd6
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Dec 11 10:16:24 2017 -0700
 
@@ -14594,7 +14890,7 @@ Date:   Sat Dec 9 16:56:20 2017 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2f8fce1cf6ce4bd12a836cc8ee15f4edbc95c95e
-Merge: d314a565 185b1136
+Merge: d314a5654 185b11367
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Dec 5 13:23:09 2017 -0700
 
@@ -15459,7 +15755,7 @@ Date:   Mon Sep 18 14:40:37 2017 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6e4c104c28952f2010c7b1cbc9ce59e148ab2d8f
-Merge: 63eeaada 4f2cbe0c
+Merge: 63eeaada8 4f2cbe0c5
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 18 16:01:43 2017 -0600
 
@@ -15921,7 +16217,7 @@ Date:   Sat Aug 12 00:05:50 2017 -0400
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5fdce5b4a70ae59f8ac1ca10d9fadbbbd62412f3
-Merge: f1bbf1bd 2a3db289
+Merge: f1bbf1bd1 2a3db2895
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Aug 11 23:45:25 2017 -0400
 
@@ -16012,7 +16308,7 @@ Date:   Fri Jul 21 17:46:55 2017 -0600
     ignore more build products in telebt-v4.0 tree
 
 commit c8dbcaf69cd538a31ab6e2b568237ae7c8656a9a
-Merge: 0cbfa444 ea3b5815
+Merge: 0cbfa444a ea3b5815b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Jul 21 17:44:03 2017 -0600
 
@@ -17648,7 +17944,7 @@ Date:   Tue Apr 25 22:10:41 2017 -0600
     telebt-v4.0: add ao_send_packet
 
 commit 30e6e087b639c6d7ec75f21ba8c6fcf6ad50fffe
-Merge: b2a5118d 75881968
+Merge: b2a5118de 75881968f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Apr 25 22:04:22 2017 -0600
 
@@ -21371,7 +21667,7 @@ Date:   Mon May 9 17:56:28 2016 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f078235803a80403014b3e54039fd2d0e0704367
-Merge: 04759ddd c457c827
+Merge: 04759ddde c457c827a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon May 9 15:52:38 2016 -0600
 
@@ -21412,7 +21708,7 @@ Date:   Fri May 6 17:10:14 2016 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit ce4c8a8ad57515e851207b0a82f3af791bb30d3e
-Merge: aa9630c3 320e312d
+Merge: aa9630c30 320e312db
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri May 6 17:49:30 2016 -0600
 
@@ -22673,7 +22969,7 @@ Date:   Sun Jan 10 18:58:31 2016 -0700
     submodule madness
 
 commit cbec66452ecd01bbd5aebf6f98443d5e0540f5d2
-Merge: 4043e070 81b8f4da
+Merge: 4043e0707 81b8f4da6
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Jan 10 18:29:07 2016 -0700
 
@@ -22726,7 +23022,7 @@ Date:   Sun Jan 10 17:45:45 2016 -0700
     modify release procedure to reflect Keith setting version in confgure.ac
 
 commit 2f35e0ba52f538ea1061bfff5bbd772b8a241386
-Merge: 86ccbac1 3fdaf745
+Merge: 86ccbac16 3fdaf745f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Jan 10 17:44:03 2016 -0700
 
@@ -23298,7 +23594,7 @@ Date:   Sat Sep 12 19:20:49 2015 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7064bc685aebeef07711e525dea4d5fbe33d235b
-Merge: ea1d2415 dda3f459
+Merge: ea1d24151 dda3f459e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Sep 29 00:46:42 2015 -0600
 
@@ -23433,7 +23729,7 @@ Date:   Tue Jul 28 01:34:25 2015 -0600
     move turnon_teledongle to new cal-freq code
 
 commit 87c8bb3956897830da1f7aaca2990a9571767b73
-Merge: 643c2fb0 d6445b37
+Merge: 643c2fb03 d6445b373
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Jul 16 07:54:35 2015 -0600
 
@@ -23450,7 +23746,7 @@ Date:   Wed Jul 15 18:31:05 2015 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 643c2fb03833d658320f476ef731bbb06fe3cc31
-Merge: e41786fb 271f56a4
+Merge: e41786fb3 271f56a41
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Jul 15 16:43:50 2015 -0600
 
@@ -24170,7 +24466,7 @@ Date:   Tue Jun 16 23:38:07 2015 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit c46c2c5767c6e909fa58587e6c864a4fbaa9fa20
-Merge: 39f43616 6cb7d76c
+Merge: 39f436167 6cb7d76c3
 Author: Robert Garbee <robert@gag.com>
 Date:   Sat Jun 13 17:40:59 2015 -0600
 
@@ -25124,7 +25420,7 @@ Date:   Sat Feb 28 15:07:16 2015 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 4af4e36cda96d053458eeb040e35886890917385
-Merge: 91b1a806 106b16b4
+Merge: 91b1a8065 106b16b4d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Feb 22 14:55:40 2015 -0700
 
@@ -26176,7 +26472,7 @@ Date:   Sat Dec 6 15:08:29 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7339d2379713b5b7e4c4fe6bad89ed93f9d39e82
-Merge: d1f91215 b6462ca3
+Merge: d1f912159 b6462ca3a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Dec 6 15:39:53 2014 -0700
 
@@ -27024,7 +27320,7 @@ Date:   Wed Sep 10 00:26:10 2014 -0600
     another build dep
 
 commit 615b69b19557a9683eeb0475b30a053a35ca51ac
-Merge: a72b7683 03654934
+Merge: a72b76836 036549343
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 10 01:30:37 2014 -0600
 
@@ -27134,7 +27430,7 @@ Date:   Sat Sep 6 22:56:25 2014 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f0d2d34f84980ab45ecedae17546f4d71e020c5e
-Merge: 8c212cd5 6c812f10
+Merge: 8c212cd5b 6c812f107
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Sep 6 23:42:47 2014 -0600
 
@@ -27201,7 +27497,7 @@ Date:   Sat Sep 6 20:39:37 2014 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8c212cd5bfa03f71a31d84bd0051314e77d88461
-Merge: e9714e34 dd26ec2e
+Merge: e9714e340 dd26ec2e7
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Sep 6 13:41:36 2014 -0600
 
@@ -27648,7 +27944,7 @@ Date:   Thu Aug 14 18:16:14 2014 -0600
     change easymega from v0.1 to v1.0, tweak to build on master, add to Makefile
 
 commit 4828be0ca5252ac9cd6061209385dcd6c4c57965
-Merge: 17e894d1 165b7dcf
+Merge: 17e894d1b 165b7dcf6
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Aug 14 17:08:36 2014 -0600
 
@@ -28331,7 +28627,7 @@ Date:   Tue Jun 24 21:22:26 2014 -0600
     need the api key in Bdale's root too
 
 commit bd440afc2a6e37b74fffcf1b977e149485095316
-Merge: 5d4f912b a0ccab8e
+Merge: 5d4f912bc a0ccab8e4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jun 24 21:17:53 2014 -0600
 
@@ -28713,7 +29009,7 @@ Date:   Sun Jun 15 17:40:27 2014 -0600
     tweaks
 
 commit a6c61fb993d3fd15183f8755d9058f05c606c9c0
-Merge: 0634119d 43848991
+Merge: 0634119df 43848991d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Jun 15 16:31:01 2014 -0700
 
@@ -30951,7 +31247,7 @@ Date:   Tue May 13 17:30:47 2014 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8124af8c27b2b9e446aa3a4f1da83d4db7c1ea87
-Merge: 6dd7eae5 3bcf4bdd
+Merge: 6dd7eae5e 3bcf4bdd3
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon May 12 23:21:55 2014 -0700
 
@@ -31691,7 +31987,7 @@ Date:   Sun Feb 23 17:42:08 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 104b8bfc9b37fda175f2cb2a1e33601fbf6f48f6
-Merge: 403b95ee 1edf7ef8
+Merge: 403b95ee2 1edf7ef80
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Feb 20 13:23:52 2014 -0700
 
@@ -31832,7 +32128,7 @@ Date:   Sun Feb 16 14:57:38 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 95f5a6ef52947088993d395874cf6aa502fd2503
-Merge: 135b6d40 de2a6199
+Merge: 135b6d401 de2a61990
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Feb 16 15:53:35 2014 -0700
 
@@ -32344,7 +32640,7 @@ Date:   Tue Jan 21 21:34:58 2014 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 13cf4000bd53ac4af66231d56e24c9eb11178a5f
-Merge: 7a8551fe 99fedbf0
+Merge: 7a8551fe8 99fedbf0e
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Jan 21 20:59:06 2014 -0800
 
@@ -32846,7 +33142,7 @@ Date:   Thu Dec 19 03:22:21 2013 -0700
     updated notes from 1.3 release
 
 commit 27528961457865acc3a38b822268df6d7cb86cfd
-Merge: 4006effc a31629df
+Merge: 4006effc5 a31629dfc
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Dec 19 02:00:10 2013 -0700
 
@@ -32949,7 +33245,7 @@ Date:   Wed Dec 18 21:02:15 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 39cb8c2896317b7538353be979ac99baffc14489
-Merge: 2a6016cf ee427961
+Merge: 2a6016cfa ee4279613
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Dec 18 21:53:52 2013 -0700
 
@@ -33001,7 +33297,7 @@ Date:   Wed Dec 18 18:30:54 2013 -0700
     update release docs to include option for submodules
 
 commit d9982c257463f23be940eea66bd4dc3aadff0043
-Merge: 1b97ed2b b63fc054
+Merge: 1b97ed2b6 b63fc0548
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Dec 18 18:25:35 2013 -0700
 
@@ -33128,7 +33424,7 @@ Date:   Wed Dec 18 11:25:05 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6df58bb0115a8da13d35ab38861f6231bea7f2a7
-Merge: 4383bafc 02195f29
+Merge: 4383bafc6 02195f297
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Dec 18 12:19:31 2013 -0700
 
@@ -33335,7 +33631,7 @@ Date:   Tue Dec 17 14:53:59 2013 -0700
     further documentation tweaks
 
 commit 90c88bab305c43eb62f964fd3ff350b8b0b5320d
-Merge: d5d6d10c dffbdd93
+Merge: d5d6d10ce dffbdd93d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Dec 17 14:09:30 2013 -0700
 
@@ -34628,7 +34924,7 @@ Date:   Tue Oct 8 09:39:29 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 488a527267decece48e6682e0e0c7fc29cbed329
-Merge: 6a1e398e f6661cc0
+Merge: 6a1e398e5 f6661cc01
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Oct 8 09:26:41 2013 -0700
 
@@ -35194,7 +35490,7 @@ Date:   Sat Aug 31 23:10:56 2013 -0500
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7ec1b97d278c7aec3199fb7270f0dcf9484c879f
-Merge: 017ed54f 41881535
+Merge: 017ed54ff 418815354
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Aug 31 08:22:09 2013 -0500
 
@@ -35263,7 +35559,7 @@ Date:   Tue Aug 27 21:28:07 2013 -0600
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit dcc51bb18985c24fa35bce0dd42ea3d847b960bf
-Merge: 7c82acc1 a73b0251
+Merge: 7c82acc1c a73b02518
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Aug 28 22:52:58 2013 -0600
 
@@ -35650,7 +35946,7 @@ Date:   Sun Aug 25 22:22:55 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 203951f6e049ec7e95489849a2bfaa01aa19c0c9
-Merge: 4babe731 b363a628
+Merge: 4babe7310 b363a628f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Aug 25 22:00:27 2013 -0700
 
@@ -35806,7 +36102,7 @@ Date:   Sat Aug 17 17:35:08 2013 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f0e126251360f050b7121f167771c057bda8747e
-Merge: d95a2c5d 4fe47adc
+Merge: d95a2c5d1 4fe47adc7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Aug 17 17:33:31 2013 +0200
 
@@ -35823,7 +36119,7 @@ Date:   Sat Aug 17 17:30:52 2013 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 4ff54bb96f6c00c0c2c7dd32f81403bac331621a
-Merge: fa0859a5 01f8df08
+Merge: fa0859a51 01f8df088
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Aug 17 16:03:26 2013 +0200
 
@@ -35841,7 +36137,7 @@ Date:   Sat Aug 17 16:01:44 2013 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 01f8df088759ee7e6bc3900a013e0ea4fafaf984
-Merge: e2ebe60a 15063cbb
+Merge: e2ebe60ad 15063cbb8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jul 30 00:15:06 2013 -0600
 
@@ -36311,7 +36607,7 @@ Date:   Tue May 21 11:30:44 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit fd5567882b732f8947b44b217552077c82a3d28e
-Merge: fd55c1fe 57b4d82d
+Merge: fd55c1fe5 57b4d82de
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue May 21 11:16:54 2013 -0700
 
@@ -36355,7 +36651,7 @@ Date:   Sun May 19 23:07:54 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 27e9b93f3d35890a49575b2ead1983ce3c2fc213
-Merge: a4df2575 d9cbef8c
+Merge: a4df2575b d9cbef8cd
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun May 19 20:40:42 2013 -0700
 
@@ -37189,7 +37485,7 @@ Date:   Fri May 10 19:21:18 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 106d212ff5920c39d95751ef6249dc141970412c
-Merge: ecb12857 09d5d6f5
+Merge: ecb128579 09d5d6f54
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu May 9 21:06:52 2013 -0700
 
@@ -38044,7 +38340,7 @@ Date:   Thu May 2 23:14:02 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7cce6c205e4595894e033ab8f0acc8064bf9f561
-Merge: 75f8229d 55915098
+Merge: 75f8229d4 55915098f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Apr 29 17:24:43 2013 -0600
 
@@ -38089,7 +38385,7 @@ Date:   Sat Apr 27 00:36:11 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit cef4e3ee95037050ae859fb2fdc0a57373764bd8
-Merge: fefc0210 f3ee7deb
+Merge: fefc02104 f3ee7deb6
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Apr 25 22:22:50 2013 -0700
 
@@ -38262,7 +38558,7 @@ Date:   Sun Apr 21 14:52:56 2013 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 49caac78786014d443d9c05f47b5eb3070ec9bd3
-Merge: 5b7bbf18 cbf38c55
+Merge: 5b7bbf183 cbf38c557
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Apr 21 14:51:07 2013 +1200
 
@@ -38339,7 +38635,7 @@ Date:   Sat Apr 20 12:22:38 2013 -0600
     improve text in telebt turn-on script
 
 commit ff332e640b27c6be37dabef58ebac350ac2347b2
-Merge: b3000609 87d6ed24
+Merge: b3000609e 87d6ed24f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Apr 17 10:41:05 2013 -0700
 
@@ -38392,7 +38688,7 @@ Date:   Tue Apr 16 14:22:23 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit d5a557004c00d1ae25da04dc63c78b816562a236
-Merge: 6592a5be 5b041769
+Merge: 6592a5be1 5b041769d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Apr 15 23:26:33 2013 -0700
 
@@ -38407,7 +38703,7 @@ Date:   Mon Apr 15 23:25:55 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6592a5be127a9c95d3b2e7d5aa6ffba71c6748b9
-Merge: c6f85cb1 eba3aa94
+Merge: c6f85cb14 eba3aa949
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Apr 15 23:19:44 2013 -0700
 
@@ -38427,7 +38723,7 @@ Date:   Mon Apr 15 23:14:22 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit c6f85cb149dff8732104521cb62b355e8a0d7148
-Merge: 3cd8ff18 58dd4b88
+Merge: 3cd8ff18a 58dd4b88f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Apr 14 20:02:10 2013 -0700
 
@@ -38478,7 +38774,7 @@ Date:   Sat Apr 13 11:39:14 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2f7015afcca7c6042365d2124d3a5b7219e8e588
-Merge: 5077f3ad 778daf0c
+Merge: 5077f3ad1 778daf0cc
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Apr 13 10:51:04 2013 -0700
 
@@ -38681,7 +38977,7 @@ Date:   Mon Apr 8 17:42:18 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6ba0df9b440b69bf5bc5f4e435b431adf303fee2
-Merge: 1d3ab47d 28adf554
+Merge: 1d3ab47d8 28adf5541
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Apr 8 18:02:37 2013 -0600
 
@@ -39374,7 +39670,7 @@ Date:   Mon Mar 11 18:16:55 2013 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 90ee11542b111befa0e96e27292dc548e5c37396
-Merge: 97efce5f d7973de3
+Merge: 97efce5f7 d7973de32
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Mar 10 11:43:06 2013 -0700
 
@@ -39419,7 +39715,7 @@ Date:   Sun Mar 10 20:40:13 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 8adadf6bd2ba623642675e4beafac4ac98b1916d
-Merge: d029acad 0c0c6d60
+Merge: d029acad6 0c0c6d60c
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Mar 10 20:24:56 2013 +1300
 
@@ -39450,7 +39746,7 @@ Date:   Sun Mar 10 20:22:09 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit d029acad6a992be9b7b4498e70605f8a1e1a4ef6
-Merge: eba7b2ef 72c5b142
+Merge: eba7b2ef8 72c5b1429
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Mar 10 19:07:01 2013 +1300
 
@@ -39495,7 +39791,7 @@ Date:   Fri Mar 8 19:41:32 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 84d35e4cbd7ea2f681c43496b9b9db84f9dd923f
-Merge: 760b1f02 e0d9128b
+Merge: 760b1f02c e0d9128b7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Mar 7 13:00:44 2013 -0800
 
@@ -39645,7 +39941,7 @@ Date:   Thu Mar 7 18:54:45 2013 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 760b1f02c178c600226f39b5e66d8cbadbf4a29b
-Merge: afd26742 cbad587b
+Merge: afd267426 cbad587b4
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Mar 6 21:53:22 2013 -0800
 
@@ -39769,7 +40065,7 @@ Date:   Sun Feb 24 01:20:16 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2120d362cefceba69e75996b6391d9558978c01d
-Merge: 5246acb7 a04c4f7b
+Merge: 5246acb70 a04c4f7b0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Feb 24 00:20:54 2013 -0800
 
@@ -39952,7 +40248,7 @@ Date:   Sun Feb 10 11:58:36 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit bf88c5f829ea5d32043431945e862a9f6c96740a
-Merge: 32270296 d05a7799
+Merge: 322702966 d05a77992
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Feb 10 01:21:52 2013 -0800
 
@@ -40290,7 +40586,7 @@ Date:   Wed Jan 16 22:05:32 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a04c4f7b07e97d568f8f6f56dd363329817fb52c
-Merge: 0c2fa961 bd84dfd8
+Merge: 0c2fa9614 bd84dfd8e
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 16 15:22:46 2013 -0800
 
@@ -40358,14 +40654,14 @@ Date:   Wed Jan 16 15:01:12 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 0c2fa9614ffe22901ba0fd089e1e02c362f9fbe0
-Merge: 456120d2 f2b59cf3
+Merge: 456120d20 f2b59cf3d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 16 10:40:28 2013 -0800
 
     Merge remote-tracking branch 'origin/telescience-v0.2' into telescience-v0.2
 
 commit 456120d201d72c89576a0c8d69b2fcba44169507
-Merge: f24c4219 994ff76a
+Merge: f24c4219d 994ff76a0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jan 16 10:39:40 2013 -0800
 
@@ -40457,7 +40753,7 @@ Date:   Sat Jan 12 20:11:38 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 670034eef48d63cdaec8d271fa93da984ffe2ea9
-Merge: 8c5ebaf8 d374d6be
+Merge: 8c5ebaf88 d374d6be7
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Jan 12 10:57:22 2013 -0700
 
@@ -40562,7 +40858,7 @@ Date:   Thu Jan 10 21:26:20 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1ed6b13e87c1cc2d6618b6ba3a293ea6e3b5752e
-Merge: acff2f46 d409417f
+Merge: acff2f466 d409417ff
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jan 10 21:48:12 2013 -0800
 
@@ -40607,7 +40903,7 @@ Date:   Wed Jan 9 15:23:46 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8c5ebaf88b459b09924753a8077393a7b0639133
-Merge: 59f355f5 d7d259c7
+Merge: 59f355f52 d7d259c7b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jan 8 22:12:17 2013 -0700
 
@@ -40944,7 +41240,7 @@ Date:   Tue Jan 1 15:30:11 2013 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 65b512c890a3ccf487655b79305ab1cfcf49259c
-Merge: 434e946a d7d259c7
+Merge: 434e946aa d7d259c7b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Dec 31 14:24:59 2012 -0800
 
@@ -41014,14 +41310,14 @@ Date:   Fri Dec 28 23:05:31 2012 -0700
     Signed-off-by: Keith Packard <keithp@gag.com>
 
 commit f7a56152808c7838c1886884bb77de2705ab076c
-Merge: daf8776f b70ca5ea
+Merge: daf8776f8 b70ca5eaf
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 28 21:50:13 2012 -0800
 
     Merge remote-tracking branch 'origin/master' into micropeak-logging
 
 commit 59f355f5288b42b2e47743d06e41e55819a55f64
-Merge: 099d2b0e b70ca5ea
+Merge: 099d2b0ea b70ca5eaf
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Dec 28 22:30:26 2012 -0700
 
@@ -41083,7 +41379,7 @@ Date:   Tue Dec 25 14:23:29 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 868ef0c9c4b208c02a87180b0eede329369bdc77
-Merge: 669cde8a 57487e78
+Merge: 669cde8a8 57487e78b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Dec 25 14:20:42 2012 -0800
 
@@ -41177,7 +41473,7 @@ Date:   Sun Dec 16 16:08:33 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit dfff41c2bec16fe4c7b198a4720eb40d8e740ac4
-Merge: 22a58b0f 00bc1a09
+Merge: 22a58b0f9 00bc1a090
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Dec 16 16:06:41 2012 -0800
 
@@ -41265,7 +41561,7 @@ Date:   Sat Dec 15 14:47:22 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6fa1ec0dbf2a4eda8d061c67b3779b83b88f29f0
-Merge: f1409311 73422bf7
+Merge: f14093117 73422bf72
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 14 19:29:50 2012 -0800
 
@@ -41319,7 +41615,7 @@ Date:   Wed Dec 12 22:53:36 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 688a9458bb03a81e71554c14295d1baacbbbd530
-Merge: 816c6b5d c8866fba
+Merge: 816c6b5d0 c8866fbae
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Dec 12 22:36:59 2012 -0800
 
@@ -41334,7 +41630,7 @@ Date:   Wed Dec 12 22:35:05 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 816c6b5d087694a9db9c34cc5ec7671a1487d9b9
-Merge: a4a84182 a4678cd8
+Merge: a4a841828 a4678cd84
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Dec 12 11:10:14 2012 -0800
 
@@ -41374,7 +41670,7 @@ Date:   Tue Dec 11 23:43:30 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a4a841828924ee37f5201d4ff0aec38459f2d802
-Merge: b26e837a d309fcff
+Merge: b26e837a6 d309fcff5
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Dec 11 14:42:43 2012 -0800
 
@@ -41392,7 +41688,7 @@ Date:   Tue Dec 11 14:41:53 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit b26e837a6f18641aae9372aab22168849ff10812
-Merge: 1489c7f7 c233ef67
+Merge: 1489c7f75 c233ef67f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Dec 9 18:33:31 2012 -0800
 
@@ -41459,7 +41755,7 @@ Date:   Fri Dec 7 17:35:15 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit bd05421991b596fe9cf73ee25c9046b0fb4e32f7
-Merge: 1f797066 1489c7f7
+Merge: 1f7970668 1489c7f75
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 7 17:34:10 2012 -0800
 
@@ -41511,7 +41807,7 @@ Date:   Fri Dec 7 10:15:25 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 748e42ebf1dfb1efd5dec6ddd93f5c7aeedeb01d
-Merge: 75912f8a c10f9a43
+Merge: 75912f8af c10f9a438
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Dec 7 10:14:11 2012 -0800
 
@@ -41963,7 +42259,7 @@ Date:   Thu Nov 29 20:36:51 2012 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit ceea0e75ac42acac4a20bf88f34bb93fd2768f4c
-Merge: 7738ddc5 285fccfa
+Merge: 7738ddc5d 285fccfa8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Nov 20 12:37:38 2012 -0700
 
@@ -42239,7 +42535,7 @@ Date:   Mon Oct 29 11:43:02 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a46c9398a5f02ff4b52b7a4309a51498560cadb5
-Merge: e57ab2a7 56023cf5
+Merge: e57ab2a7b 56023cf5d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 26 14:08:32 2012 -0700
 
@@ -42334,7 +42630,7 @@ Date:   Thu Oct 25 00:12:57 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 282f0451dd141db3304ab73e4020a849e59721eb
-Merge: 0680d62d 78e1de48
+Merge: 0680d62d5 78e1de481
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 25 00:09:01 2012 -0700
 
@@ -42462,7 +42758,7 @@ Date:   Wed Oct 24 20:52:09 2012 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 055f3232decc07e064d596469b81cf9869411c2d
-Merge: 8ca58e20 9e60fa21
+Merge: 8ca58e202 9e60fa214
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Oct 23 09:38:36 2012 -0600
 
@@ -42490,7 +42786,7 @@ Date:   Tue Oct 23 19:22:52 2012 +1300
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 9e60fa214ad2c48fbe8f7e5c437681aa35d249fa
-Merge: 27c31572 4b41561a
+Merge: 27c31572f 4b41561ab
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Oct 22 22:39:31 2012 -0700
 
@@ -42722,7 +43018,7 @@ Date:   Sun Oct 21 13:01:03 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7f664da148ae15d46d179d8ecede6fc0bc710ffb
-Merge: 3aba5eb5 23b0c2fe
+Merge: 3aba5eb5a 23b0c2fe9
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 18 16:49:28 2012 -0700
 
@@ -42760,7 +43056,7 @@ Date:   Thu Oct 18 15:34:41 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5a55501660ebab3b858a48483c5df1cfb4e858e4
-Merge: 0361235c 440365bd
+Merge: 0361235c9 440365bd1
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Oct 18 15:18:52 2012 -0700
 
@@ -43327,7 +43623,7 @@ Date:   Sat Oct 6 17:05:59 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 82fdc42d61340e6b76580ff12a9e1bea59eb8079
-Merge: 6b8881a7 2cac8c57
+Merge: 6b8881a7b 2cac8c572
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Oct 3 10:44:28 2012 -0700
 
@@ -43386,21 +43682,21 @@ Date:   Thu Sep 20 11:33:24 2012 +0200
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2f2734bb418f5c3a89fa3f1bf1b98ce4cfe432e1
-Merge: e69a433f 3fe5c2f9
+Merge: e69a433fd 3fe5c2f9f
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 20 11:30:19 2012 +0200
 
     Merge remote-tracking branch 'mjb/altosdroid'
 
 commit e69a433fd93b9f6bd2297d8045eb075fee29e73b
-Merge: 19243ecc 6e0d672b
+Merge: 19243ecc9 6e0d672b8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 20 11:30:11 2012 +0200
 
     Merge remote-tracking branch 'mjb/prefs_interface'
 
 commit 19243ecc9b5bbdcc069ae24acf1ca807322c84d8
-Merge: 90c1b6db 0ef8b714
+Merge: 90c1b6db8 0ef8b7148
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Sep 20 11:29:55 2012 +0200
 
@@ -43488,7 +43784,7 @@ Date:   Mon Sep 17 01:29:33 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 52d3cad4f744140e1aa06fdfc0d49a0cf8734fd4
-Merge: 31f5a026 6e0d672b
+Merge: 31f5a0265 6e0d672b8
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Sun Sep 16 22:27:04 2012 +1200
 
@@ -43743,7 +44039,7 @@ Date:   Thu Sep 13 15:12:33 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 320d90c376dccfe1599505e3b485df8d46e34bb3
-Merge: 9a7d6431 2e6c6a6c
+Merge: 9a7d64317 2e6c6a6c1
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Sep 13 15:36:37 2012 -0600
 
@@ -43760,7 +44056,7 @@ Date:   Thu Sep 13 00:35:27 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 9a7d6431777ce3377b788ddac6cb9fadd53c039c
-Merge: 2439f53e 9728b20a
+Merge: 2439f53ea 9728b20a4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Sep 13 00:58:30 2012 -0600
 
@@ -43817,7 +44113,7 @@ Date:   Wed Sep 12 19:50:07 2012 -0600
     update Releasing for non-native versioning and builds on debian branch
 
 commit fe009534ce6846b6db96cac8f6c2d53ba8010d91
-Merge: 69d42b26 8ee29fe4
+Merge: 69d42b262 8ee29fe48
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 12 19:49:51 2012 -0600
 
@@ -43905,7 +44201,7 @@ Date:   Tue Sep 11 23:36:26 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 69d42b26223b45df4167aa3baafba100ad71baab
-Merge: 3e9078cb 3fa5fbdf
+Merge: 3e9078cb1 3fa5fbdfd
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 12 00:26:21 2012 -0600
 
@@ -43942,7 +44238,7 @@ Date:   Tue Sep 11 22:17:22 2012 -0600
     releasing 1.1
 
 commit 4563624638884b7b2f16cd4d396c00690e045999
-Merge: 11fbcf5e e5a55dbf
+Merge: 11fbcf5e3 e5a55dbf2
 Author: Tom Marble <tmarble@info9.net>
 Date:   Tue Sep 11 22:50:18 2012 -0500
 
@@ -44000,7 +44296,7 @@ Date:   Tue Sep 11 12:44:24 2012 -0500
     Add appropriate Java build deps as given from autoconf
 
 commit 8e506274a35eccacd2d4523faa08d279a201753f
-Merge: 0bc3ed53 1fc97dd9
+Merge: 0bc3ed53a 1fc97dd98
 Author: Tom Marble <tmarble@info9.net>
 Date:   Tue Sep 11 11:39:22 2012 -0500
 
@@ -44013,7 +44309,7 @@ Date:   Tue Sep 11 11:37:14 2012 -0500
     Use explicit build deps for altosui (avoids * wildcarding)
 
 commit 1fc97dd9875a7639533a34438c4c7c999412eb3a
-Merge: 8397d2b0 4420d4a9
+Merge: 8397d2b04 4420d4a9f
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Sep 11 10:35:04 2012 -0600
 
@@ -44179,7 +44475,7 @@ Date:   Sun Sep 9 13:09:27 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit e2b458a448106ba1ab207f0ea6824b56927d8547
-Merge: 9682e9e6 3fe93220
+Merge: 9682e9e6f 3fe932206
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Sep 9 13:03:47 2012 -0700
 
@@ -44359,7 +44655,7 @@ Date:   Sat Sep 1 00:14:27 2012 -0500
     This reverts commit ada6f2dfc045e77cb9499f20cdec1b4a54ef0db1.
 
 commit ec9e1186dce079a2f2b7be8050216ddb1bc1af66
-Merge: 503eabd0 6d31f8d1
+Merge: 503eabd0e 6d31f8d15
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Aug 31 22:24:16 2012 -0500
 
@@ -44466,7 +44762,7 @@ Date:   Thu Aug 30 16:28:53 2012 -0500
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit b635cb26ba54c8f5c6a958e0ab0bc4d34d33b635
-Merge: 354c1fed a8ecf3aa
+Merge: 354c1fed7 a8ecf3aa4
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Aug 30 16:24:38 2012 -0500
 
@@ -44570,7 +44866,7 @@ Date:   Thu Aug 30 13:13:20 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 583458772746317b98fced907ec780edff465888
-Merge: aea10c10 17b6ffb6
+Merge: aea10c107 17b6ffb6c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Aug 29 11:29:24 2012 -0700
 
@@ -44791,7 +45087,7 @@ Date:   Mon Aug 27 22:45:20 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5ed88fb72c3e3ecf3333c700d838667db71cfbdc
-Merge: adbe64c5 621d0930
+Merge: adbe64c5a 621d09302
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 28 23:39:53 2012 -0600
 
@@ -45764,21 +46060,21 @@ Date:   Wed Aug 8 07:07:49 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 9456332fc16269270a2e9b7ef0b54523800cfe27
-Merge: bd023491 4d4ad34a
+Merge: bd0234911 4d4ad34ae
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Wed Aug 8 06:49:15 2012 +1200
 
     Merge branch 'master' of git://git.gag.com/fw/altos
 
 commit 4d4ad34aec0c75c66162b992f1e52947e4685730
-Merge: c7f22850 8e4ebd1f
+Merge: c7f228503 8e4ebd1f6
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Aug 7 11:48:20 2012 -0700
 
     Merge remote-tracking branch 'mjb/master'
 
 commit bd02349111ae0f39b320e6a10a330051ddc39fdf
-Merge: 8e4ebd1f c7f22850
+Merge: 8e4ebd1f6 c7f228503
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Wed Aug 8 06:46:56 2012 +1200
 
@@ -45965,7 +46261,7 @@ Date:   Thu Aug 2 21:20:23 2012 +1200
     Signed-off-by: Mike Beattie <mike@ethernal.org>
 
 commit 7481d06bebc2dc1473f451971d8b744c9da4e726
-Merge: 599e28b2 c56dead7
+Merge: 599e28b22 c56dead72
 Author: Mike Beattie <mike@ethernal.org>
 Date:   Thu Aug 2 21:18:15 2012 +1200
 
@@ -46122,7 +46418,7 @@ Date:   Wed Jul 18 18:41:00 2012 -0600
     telescience: correctly calculating rate values with higher resolution
 
 commit e2b472bbb2418fc13be42dbc7c52beb88479c46d
-Merge: 75d6aa6f b242f275
+Merge: 75d6aa6f7 b242f2756
 Author: Robert Garbee <robert@gag.com>
 Date:   Wed Jul 18 14:25:27 2012 -0600
 
@@ -48428,7 +48724,7 @@ Date:   Mon May 7 23:14:14 2012 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 6a973f788563ccc66b01cc7557a004dabef18d09
-Merge: d387f246 da2c920b
+Merge: d387f246b da2c920b9
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed May 16 09:13:53 2012 -0600
 
@@ -50761,7 +51057,7 @@ Date:   Fri Oct 7 09:53:09 2011 -0600
     Fix up the new makefiles
 
 commit 128bbfa150f88c09f7adde2434b7bf0b5a9ed556
-Merge: f6f54d70 246864b0
+Merge: f6f54d70b 246864b05
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 7 08:41:56 2011 -0600
 
@@ -50773,7 +51069,7 @@ Date:   Fri Oct 7 08:41:56 2011 -0600
     fix version number
 
 commit f6f54d70b768dca1715ddddea64a4df00d82b09e
-Merge: 1c344b76 0d10e257
+Merge: 1c344b760 0d10e2576
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 7 08:40:14 2011 -0600
 
@@ -50814,7 +51110,7 @@ Date:   Mon Sep 26 11:50:28 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1c344b760776cd5d8c0297d8db9bf02687381b4e
-Merge: 4ed53ef8 fc4173ff
+Merge: 4ed53ef83 fc4173ff8
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Oct 7 08:34:59 2011 -0600
 
@@ -50832,7 +51128,7 @@ Date:   Tue Sep 27 00:59:08 2011 -0600
     add run-time dependency on libjfreechart-java
 
 commit 989aae5b18856e3420ea5b7a26ddd8dccae9d6d3
-Merge: 0552fbed e44f1ffb
+Merge: 0552fbed3 e44f1ffb7
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Sep 24 15:34:59 2011 -0600
 
@@ -51398,7 +51694,7 @@ Date:   Fri Aug 26 09:41:46 2011 -0600
     get ready for a 1.0.1 release
 
 commit 674231773256bacd7acb4b5718c47412e47b813f
-Merge: 08e3d54b 3bfe8df4
+Merge: 08e3d54ba 3bfe8df44
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 26 09:37:01 2011 -0600
 
@@ -51558,7 +51854,7 @@ Date:   Thu Aug 25 01:11:47 2011 -0600
     prepare to release
 
 commit 73abe19acf709c00f5352ec12e8cd6edae1d1963
-Merge: 1bd781da 5158493c
+Merge: 1bd781da9 5158493c8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Aug 25 00:34:49 2011 -0600
 
@@ -51585,7 +51881,7 @@ Date:   Wed Aug 24 23:21:02 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit e268798dc260311f5f0167909481b41c9d27fc1c
-Merge: 458f816a 242344d3
+Merge: 458f816ad 242344d3e
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Aug 24 23:06:44 2011 -0700
 
@@ -51602,7 +51898,7 @@ Date:   Wed Aug 24 23:06:01 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 242344d3e32e7c7cd9270d708555923fa888e4d8
-Merge: 5c1cf749 94a1b220
+Merge: 5c1cf7492 94a1b220b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 23:51:38 2011 -0600
 
@@ -51626,7 +51922,7 @@ Date:   Wed Aug 24 22:29:56 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit edfb553bb4fa5b0c7c6c658505b2a99d05fb13bf
-Merge: c74ab82a ec96f116
+Merge: c74ab82a7 ec96f1166
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 23:23:56 2011 -0600
 
@@ -51660,7 +51956,7 @@ Date:   Wed Aug 24 22:18:29 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 50769fbbeaaf61111d363411e0ef0b2868681cf4
-Merge: 425fa995 d92c1736
+Merge: 425fa995a d92c17361
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 23:15:20 2011 -0600
 
@@ -51690,7 +51986,7 @@ Date:   Wed Aug 24 23:03:23 2011 -0600
     more tweaks
 
 commit 09981cd024297fd4ef093c7468de2b9d5f3c2691
-Merge: a476e766 03c8b270
+Merge: a476e7662 03c8b2702
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 22:42:39 2011 -0600
 
@@ -51757,7 +52053,7 @@ Date:   Wed Aug 24 21:39:21 2011 -0600
     doc tweaks through chap 3
 
 commit 3d88e0493ab446d7c7011786390d30618a72d045
-Merge: 02d65453 5a9972d4
+Merge: 02d654532 5a9972d41
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 21:26:26 2011 -0600
 
@@ -51832,7 +52128,7 @@ Date:   Wed Aug 24 01:41:53 2011 -0600
     another test round
 
 commit 4d94e8f9f807a0bbeab0cdead011e74eeca1d1b6
-Merge: 4b5369dc 3b0a9a1c
+Merge: 4b5369dc3 3b0a9a1c8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 24 01:38:58 2011 -0600
 
@@ -52084,7 +52380,7 @@ Date:   Sun Aug 21 22:12:04 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit a08826292ebd802a1ff2effccac3b96fd061c47d
-Merge: 3366cfe6 55be3db2
+Merge: 3366cfe61 55be3db2e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 22 16:08:55 2011 -0600
 
@@ -53158,7 +53454,7 @@ Date:   Sun Jul 17 11:25:47 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f7cd8317bf78ece334e1ceb0263b875ca43bbbd2
-Merge: 51796e2f a482d904
+Merge: 51796e2f1 a482d904a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Jul 17 08:17:44 2011 -0700
 
@@ -53216,7 +53512,7 @@ Date:   Sat Jul 16 22:34:44 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit abb8510b97ce9cbbff0275cc31f74780fe1ce138
-Merge: 0929ee32 00e6981c
+Merge: 0929ee32f 00e6981c2
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Jul 16 21:06:37 2011 -0700
 
@@ -54082,7 +54378,7 @@ Date:   Tue Apr 19 15:29:39 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 44fb71ca3e5bccd5f601fc5a2d5da7292050b1d6
-Merge: 2ebdb888 c269e263
+Merge: 2ebdb888f c269e263a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Tue Apr 19 14:06:39 2011 -0700
 
@@ -54291,7 +54587,7 @@ Date:   Thu Apr 7 22:00:38 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f28efe271f9670473249574f6bcf6e160fe58c7b
-Merge: 8db5c52f 835ab3a8
+Merge: 8db5c52f1 835ab3a8c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Apr 1 19:35:22 2011 -0700
 
@@ -55083,7 +55379,7 @@ Date:   Fri Mar 18 20:26:12 2011 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5db94e1e230bade966a997aa83165405a9ec9d83
-Merge: 1a8f45e7 cbb968f5
+Merge: 1a8f45e7b cbb968f5c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Mar 18 21:12:39 2011 -0600
 
@@ -55590,7 +55886,7 @@ Date:   Tue Jan 18 17:27:11 2011 -0700
     update changelogs for Debian build
 
 commit da42f406e88ccc821cd45d5a94d5afec65ec50e9
-Merge: ea4cdfb8 cf550f9b
+Merge: ea4cdfb87 cf550f9b9
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Jan 17 09:50:17 2011 -0700
 
@@ -56587,7 +56883,7 @@ Date:   Wed Nov 24 21:39:18 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 51c7741040d95c5deece939dae5e4136cc04afc4
-Merge: d1dbe3b6 4e47c44d
+Merge: d1dbe3b69 4e47c44d3
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Nov 24 21:00:52 2010 -0800
 
@@ -56619,7 +56915,7 @@ Date:   Wed Nov 24 20:53:36 2010 -0700
     fix missing section close in Site Map content
 
 commit db2b19b8f0d452d682d53c7ed0ff6e359b46efa0
-Merge: b372f3c0 915f881d
+Merge: b372f3c0e 915f881d6
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Nov 24 18:57:35 2010 -0800
 
@@ -56640,7 +56936,7 @@ Date:   Thu Nov 25 09:52:30 2010 +1000
     doc: Document altosui "Site Map" tab
 
 commit f01096c4b42f9a4720ed0414826c2a283a992545
-Merge: 357826aa 3fbefb3e
+Merge: 357826aa9 3fbefb3ee
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Thu Nov 25 09:10:50 2010 +1000
 
@@ -56661,7 +56957,7 @@ Date:   Thu Nov 25 09:07:34 2010 +1000
     docs: Document altosui "Graph Data" button
 
 commit 7811e6dfa6caf10251da7df7c24b98cdc3787892
-Merge: 71b1949e 7a50837e
+Merge: 71b1949e5 7a50837ea
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Thu Nov 25 08:47:36 2010 +1000
 
@@ -56763,7 +57059,7 @@ Date:   Tue Nov 23 18:56:46 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 71b1949e50f4533bcf44537da65b19bc67863c8e
-Merge: a79225c2 f1892b13
+Merge: a79225c21 f1892b137
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Wed Nov 24 12:14:11 2010 +1000
 
@@ -56777,7 +57073,7 @@ Date:   Tue Nov 23 18:58:11 2010 -0700
     while before I tackle that, if ever.
 
 commit a79225c215f17fa5218ddd9db4fc3f5c563a9f74
-Merge: 84cd5d42 853b7112
+Merge: 84cd5d42d 853b7112e
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Wed Nov 24 11:55:14 2010 +1000
 
@@ -56802,7 +57098,7 @@ Date:   Wed Nov 24 02:11:36 2010 +1000
     altosui: don't switch away from user selected tab
 
 commit ae55a107f12546dc65f04618c7abc17beb920d73
-Merge: d1005f68 737f2fdd
+Merge: d1005f683 737f2fdd0
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Wed Nov 24 01:53:46 2010 +1000
 
@@ -56823,14 +57119,14 @@ Date:   Mon Nov 22 21:07:10 2010 -0700
     add a rudimentary --help for command line use
 
 commit d1005f68376d695039c314b8d7a68bbf9acbca4f
-Merge: 9a83e0dc 22c09781
+Merge: 9a83e0dc7 22c09781a
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Nov 23 10:14:55 2010 +1000
 
     Merge branch 'buttonbox' of git://git.gag.com/fw/altos into buttonbox
 
 commit 22c09781af1df4b38562b577e9926c23e4a397f2
-Merge: b27327a0 a79606a6
+Merge: b27327a05 a79606a65
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Nov 22 16:02:22 2010 -0800
 
@@ -56860,7 +57156,7 @@ Date:   Mon Nov 22 15:53:27 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 9a83e0dc79f7a7467c7814d58daa2a2b89e50972
-Merge: 902735ff a79606a6
+Merge: 902735ffb a79606a65
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Nov 23 08:07:04 2010 +1000
 
@@ -56901,7 +57197,7 @@ Date:   Sun Nov 21 17:39:50 2010 +1000
     AltosSiteMap: ensure buffer around active tile
 
 commit ec47bc93a487614714a752cb30ec9fe3d8f72929
-Merge: 0393830f e7954c82
+Merge: 0393830f8 e7954c820
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 16:08:37 2010 +1000
 
@@ -56959,7 +57255,7 @@ Date:   Sun Nov 21 13:07:11 2010 +1000
     AltosSiteMap: extend map if rocket goes far away
 
 commit 835b903727a2eabda8d9659cc46e53301f92897c
-Merge: 440a0f3f 87891355
+Merge: 440a0f3f5 878913551
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 11:15:02 2010 +1000
 
@@ -56985,7 +57281,7 @@ Date:   Sat Nov 20 16:55:12 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 2a7dc3ba36bac81640a9498e0d0caf1470b57c19
-Merge: e5b1adae ece2c86e
+Merge: e5b1adae9 ece2c86e2
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 10:45:15 2010 +1000
 
@@ -56995,7 +57291,7 @@ Date:   Sun Nov 21 10:45:15 2010 +1000
             ao-tools/altosui/AltosFlightUI.java
 
 commit 8df185cd95cfecbed8272dd1275d077c5b45535b
-Merge: ece2c86e 1e712647
+Merge: ece2c86e2 1e712647d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Nov 20 16:35:48 2010 -0800
 
@@ -57034,7 +57330,7 @@ Date:   Sun Nov 21 08:58:44 2010 +1000
     altosui: reindent
 
 commit a59a204e188e40ec8848a0dc63d6de710cee3039
-Merge: 82636305 37f0201d
+Merge: 826363050 37f0201d7
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 21 08:56:13 2010 +1000
 
@@ -57112,14 +57408,14 @@ Date:   Sat Nov 20 21:06:37 2010 +1000
     AltosSiteMap: add autoscroll and grabndrag scroll
 
 commit 74cab8503b51ba6fb05a4d12a031c749e870b0ef
-Merge: 0ecf0331 9a99cabc
+Merge: 0ecf03311 9a99cabc1
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Nov 20 18:20:45 2010 +1000
 
     Merge branch 'buttonbox' of git://git.gag.com/fw/altos into buttonbox
 
 commit 0ecf033110084f1a8be98282d7029dc14f70dab5
-Merge: 081fbd57 71c41ead
+Merge: 081fbd571 71c41eadd
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Nov 20 18:14:30 2010 +1000
 
@@ -57150,7 +57446,7 @@ Date:   Sat Nov 20 00:09:03 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 081fbd5715f9d3d81d98e149fb95d40447c07a79
-Merge: 90b9bc44 7920ed5c
+Merge: 90b9bc447 7920ed5c3
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Nov 20 17:40:49 2010 +1000
 
@@ -57301,7 +57597,7 @@ Date:   Fri Nov 19 12:09:46 2010 +1000
     altosui: tile site maps
 
 commit 939be6793238a275b7682ecc376fed14379cf044
-Merge: e68fe945 1a4b6e96
+Merge: e68fe9454 1a4b6e96f
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Thu Nov 18 05:54:06 2010 +1000
 
@@ -57451,7 +57747,7 @@ Date:   Sun Nov 14 00:57:45 2010 +1000
     AltosTelemetryReader: actually open serial port
 
 commit 9c32b93ef5fb43558fb0179ea1b047e35b7ed6e8
-Merge: 991541f5 a6f30fae
+Merge: 991541f57 a6f30fae9
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Nov 14 00:29:11 2010 +1000
 
@@ -57468,7 +57764,7 @@ Date:   Fri Nov 12 17:02:22 2010 -0800
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 1bdc6166f3bc5ce3f8e55acb1484923781412e21
-Merge: f1118717 5c6a5335
+Merge: f11187177 5c6a5335a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Nov 12 17:32:43 2010 -0700
 
@@ -57518,7 +57814,7 @@ Date:   Fri Nov 12 02:07:41 2010 +1000
     add site map tab, at least for QRS launches
 
 commit 5394548fa5c7bdbfcc01e8aa19e93e1cf6345e2a
-Merge: 891e629f 75f7698b
+Merge: 891e629f6 75f7698b9
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Nov 10 22:11:21 2010 -0800
 
@@ -57734,7 +58030,7 @@ Date:   Tue Sep 28 17:56:49 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 5a119fd92532d53e552efe1f7c61e87181fcace0
-Merge: 28da3406 82744c34
+Merge: 28da34064 82744c349
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Sep 27 22:28:07 2010 -0700
 
@@ -57763,7 +58059,7 @@ Date:   Tue Sep 28 14:45:01 2010 +1000
     Hax0r graphing to support telem/eeprom files
 
 commit e2b9f47a205348d38756c70e928a2a9183de6884
-Merge: 7ef3ad0c 80320319
+Merge: 7ef3ad0c9 803203197
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Sep 28 12:55:47 2010 +1000
 
@@ -57811,7 +58107,7 @@ Date:   Mon Sep 27 17:11:48 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 7ef3ad0c9354c0484c25badc69334b59c7f355e2
-Merge: eb74866e e66919aa
+Merge: eb74866e9 e66919aa4
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Fri Sep 24 10:28:06 2010 +1000
 
@@ -57850,7 +58146,7 @@ Date:   Mon Aug 30 14:00:04 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit eb74866e919e8c661153847871f5a79e66d37296
-Merge: af404b42 12605899
+Merge: af404b428 126058997
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Mon Sep 20 22:05:26 2010 +1000
 
@@ -57893,7 +58189,7 @@ Date:   Wed Sep 15 06:51:05 2010 +1000
     Add graphing.
 
 commit 3d64f5a6511529ca53699190f4d54de1ba62a9bd
-Merge: ec6da082 b9623f8e
+Merge: ec6da0824 b9623f8ef
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sat Sep 11 15:15:14 2010 +1000
 
@@ -57928,7 +58224,7 @@ Date:   Fri Sep 10 10:42:35 2010 -0600
     make the column headers comma separated, too, so they align with the data
 
 commit ec6da0824474e46de842845d7b53fe1a1dde33ed
-Merge: 7c2e4114 10310672
+Merge: 7c2e4114a 10310672a
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Fri Sep 10 16:11:34 2010 +1000
 
@@ -57991,7 +58287,7 @@ Date:   Thu Sep 9 23:51:23 2010 -0600
     rewind packaging changelog
 
 commit 7c2e4114a3a43f919a7a6c967d3f16e5d630f90f
-Merge: ddc83b4c af200f5b
+Merge: ddc83b4c4 af200f5b8
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Fri Sep 10 15:50:01 2010 +1000
 
@@ -58096,7 +58392,7 @@ Date:   Thu Sep 9 20:06:09 2010 -0600
     update changelogs for Debian build
 
 commit 0ea75761416bff299233991e961ba25b6c7dcf89
-Merge: 35d70c92 8ee3464d
+Merge: 35d70c923 8ee3464d8
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu Sep 9 20:05:27 2010 -0600
 
@@ -58209,7 +58505,7 @@ Date:   Thu Sep 9 15:43:47 2010 -0600
     update changelogs for Debian build
 
 commit ddc83b4c401be965a9947782becf20cc8c54e6a2
-Merge: afea6c26 3d49d5f6
+Merge: afea6c264 3d49d5f69
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Sun Sep 5 20:49:34 2010 +1000
 
@@ -59021,7 +59317,7 @@ Date:   Fri Aug 27 12:41:26 2010 -0600
     update changelogs for Debian build
 
 commit cf65c6b8056c4af7c26b52ec6f9fbd3400cef638
-Merge: 5f2f6a8f ae5eff7b
+Merge: 5f2f6a8f9 ae5eff7bc
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 27 12:38:25 2010 -0600
 
@@ -59070,7 +59366,7 @@ Date:   Fri Aug 27 12:04:13 2010 -0600
     fix up the wrapper's path to the jar file
 
 commit 5f2f6a8f9ba56be867888758848bc7f152ccbd47
-Merge: 63bd34cd 9d1b27fa
+Merge: 63bd34cd1 9d1b27fa1
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Aug 27 11:00:31 2010 -0700
 
@@ -59109,7 +59405,7 @@ Date:   Fri Aug 27 11:17:54 2010 -0600
     add a dummy install target
 
 commit c443f43f8dee6e0fcbcecf9d09e948fd928b7af4
-Merge: 29504311 2923cf50
+Merge: 295043112 2923cf505
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Fri Aug 27 03:08:53 2010 -0600
 
@@ -59334,7 +59630,7 @@ Date:   Mon Aug 23 23:15:05 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit afea6c264c5ebf12f1d629bd4bc724da86d11b7a
-Merge: 0e17853c 9d1b27fa
+Merge: 0e17853c0 9d1b27fa1
 Author: Anthony Towns <aj@erisian.com.au>
 Date:   Tue Aug 24 00:02:31 2010 -0600
 
@@ -59352,7 +59648,7 @@ Date:   Mon Aug 23 23:01:36 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 295043112ccde35092945c286596f9045ee6fa05
-Merge: 2007288d ef8376c4
+Merge: 2007288da ef8376c4d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 23 23:11:22 2010 -0600
 
@@ -59754,7 +60050,7 @@ Date:   Thu Jul 29 13:30:36 2010 -0600
     update changelogs for Debian build
 
 commit 7877496d47ce6d25210c0e1c6500666dbfc0876c
-Merge: c71061a3 4cf39b13
+Merge: c71061a37 4cf39b13a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jul 29 12:07:49 2010 -0700
 
@@ -59973,7 +60269,7 @@ Date:   Wed Jul 28 15:41:34 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 8a6040e143ecc7830cc1c0114de85f3b72c067eb
-Merge: 024d0773 554a97ef
+Merge: 024d07730 554a97ef4
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jul 28 13:29:51 2010 -0700
 
@@ -60017,7 +60313,7 @@ Date:   Wed Jul 28 12:24:53 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 172a2817dde6718724f2b5fad5a7761801446fa0
-Merge: f2a006fd 81bf2042
+Merge: f2a006fd9 81bf2042c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jul 28 11:20:22 2010 -0700
 
@@ -60260,7 +60556,7 @@ Date:   Tue Jul 20 22:08:56 2010 -0600
     update changelogs for Debian build
 
 commit e747954b6a9e71705f619684df8a118a909b1039
-Merge: bd40a5b4 695879db
+Merge: bd40a5b43 695879dbc
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Jul 20 22:07:22 2010 -0600
 
@@ -60331,14 +60627,14 @@ Date:   Mon Jun 21 11:44:32 2010 -0700
     ao-postflight: was walking off state.data array
 
 commit 11d155d558d0b121b66f089adee0a47d71f65a78
-Merge: 544003a8 24393eab
+Merge: 544003a8d 24393eab0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jun 16 21:54:06 2010 -0700
 
     Merge remote branch 'mjb/master'
 
 commit 544003a8da0248fd6f3c62ded86af74ab7cdadf6
-Merge: 267923e5 93c1e29b
+Merge: 267923e56 93c1e29b0
 Author: Keith Packard <keithp@keithp.com>
 Date:   Wed Jun 16 21:52:23 2010 -0700
 
@@ -60412,7 +60708,7 @@ Date:   Tue May 18 00:24:03 2010 -0600
     merge the altusmetrum-themes package
 
 commit 0c6cf621dfd8339b8bc3915750a3147235f1331b
-Merge: 32e430b8 563a9dcd
+Merge: 32e430b8a 563a9dcdf
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon May 17 23:59:43 2010 -0600
 
@@ -60437,7 +60733,7 @@ Date:   Mon May 17 21:30:57 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 69092ffd23ac1928d5c84413fd00c2423f313fc2
-Merge: 3c2211ad cc002c0a
+Merge: 3c2211ad7 cc002c0a4
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon May 17 20:10:46 2010 -0600
 
@@ -60539,7 +60835,7 @@ Date:   Thu May 6 12:48:00 2010 -0600
     update changelogs for Debian build
 
 commit 314d27a73c903fef2968dabac3d5313573713460
-Merge: fa77db2f 823fc0ac
+Merge: fa77db2ff 823fc0ac2
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Thu May 6 12:47:30 2010 -0600
 
@@ -60647,7 +60943,7 @@ Date:   Tue Apr 27 00:18:43 2010 -0600
     update changelogs for Debian build
 
 commit 99094f02bf4849ba1f6b9842ded6c39d894320f7
-Merge: 641e76c5 75d8ffd4
+Merge: 641e76c5d 75d8ffd4e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Apr 27 00:17:37 2010 -0600
 
@@ -60689,7 +60985,7 @@ Date:   Thu Apr 22 14:53:44 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit f4383394b5d2b275b21e3ce8040d8cb9e48bb375
-Merge: 5f93cf8c c879b178
+Merge: 5f93cf8c7 c879b178d
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Apr 18 08:36:07 2010 -0600
 
@@ -60794,7 +61090,7 @@ Date:   Thu Apr 8 17:28:17 2010 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit baaaac499cfbc1286ae55374cfdc796d32983b92
-Merge: a4356b9b dec9971d
+Merge: a4356b9bc dec9971d7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Apr 8 13:31:23 2010 -0700
 
@@ -60807,7 +61103,7 @@ Date:   Thu Apr 8 13:30:16 2010 -0700
     Use 16-bit flite voice (which appears to have changed symbols recently)
 
 commit 447c121fc1ceb878e45718ad1364a5349965a59a
-Merge: 10330d23 53ca3f98
+Merge: 10330d235 53ca3f98a
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Apr 8 11:46:56 2010 -0700
 
@@ -61081,7 +61377,7 @@ Date:   Tue Mar 30 23:18:37 2010 -0600
     update changelogs for Debian build
 
 commit b41e617080fe825f7810ee5eee52ea37f7618ec6
-Merge: 28e40ccf df7bda1f
+Merge: 28e40ccfc df7bda1f3
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Mar 30 23:15:32 2010 -0600
 
@@ -61109,7 +61405,7 @@ Date:   Mon Mar 15 12:04:18 2010 -0600
     move gbp.conf into debian/
 
 commit df7bda1f32b0049c3878c325ea0b55999f3980e3
-Merge: 23da4f3b a7042fe7
+Merge: 23da4f3bc a7042fe7d
 Author: Keith Packard <keithp@keithp.com>
 Date:   Fri Mar 12 10:38:26 2010 -0800
 
@@ -61171,7 +61467,7 @@ Date:   Sat Feb 27 17:36:13 2010 -0700
     update changelogs for Debian build
 
 commit a1478f65538fdaac7b58ffbd958a035b74956099
-Merge: 901fce5f bbf8c9f1
+Merge: 901fce5fe bbf8c9f17
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Feb 27 15:19:33 2010 -0800
 
@@ -62132,7 +62428,7 @@ Date:   Mon Nov 2 16:54:06 2009 -0700
     update changelogs for Debian build
 
 commit 7db9d86178ecfd58cc1c17ac9fcbdcfd2f13aaec
-Merge: b219801f f9de2000
+Merge: b219801fb f9de20000
 Author: Keith Packard <keithp@keithp.com>
 Date:   Mon Nov 2 15:47:40 2009 -0800
 
@@ -62181,7 +62477,7 @@ Date:   Mon Nov 2 15:56:42 2009 -0700
     de-version the libreadline-dev build dependency
 
 commit 0b483233118673cbc2cda1be6acd379df82bc95a
-Merge: ca5d323a 550482d9
+Merge: ca5d323a3 550482d95
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sun Nov 1 20:59:02 2009 -0800
 
@@ -62370,14 +62666,14 @@ Date:   Mon Oct 12 15:57:19 2009 -0600
     update changelogs for Debian build
 
 commit c57bd7fd2f80e50b0b4c87fccb024ab07c93773d
-Merge: adf8764b 2b765728
+Merge: adf8764bc 2b765728c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Oct 12 15:57:08 2009 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
 commit 69b6f6bb465163cf767bb68e0e4a716d8ad2b39c
-Merge: bc77da68 2b765728
+Merge: bc77da68c 2b765728c
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 17:16:21 2009 -0700
 
@@ -62395,7 +62691,7 @@ Date:   Sat Oct 10 17:15:38 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit bc77da68c9cb7d4cca483eadbbb7e9ccf71c0060
-Merge: 46cccf62 8f7ea3de
+Merge: 46cccf62f 8f7ea3de7
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 15:09:48 2009 -0700
 
@@ -62424,14 +62720,14 @@ Date:   Sat Oct 10 15:11:23 2009 -0600
     update changelogs for Debian build
 
 commit 541da6f3bbf81be93dfe3c01f7c8cfd757b28a2b
-Merge: dfc73cba 5f26ad66
+Merge: dfc73cba1 5f26ad663
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sat Oct 10 15:05:50 2009 -0600
 
     Merge branch 'master' of ssh://git.gag.com/scm/git/fw/altos
 
 commit 46cccf62fb40514b5930fcb2ffdaf2735415c764
-Merge: fb8f3fee 5f26ad66
+Merge: fb8f3fee6 5f26ad663
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 14:00:03 2009 -0700
 
@@ -62452,7 +62748,7 @@ Date:   Sat Oct 10 13:58:16 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit fb8f3fee6a1bab1e46d782e84405845cee2dadb4
-Merge: 22856cf8 b8fc3975
+Merge: 22856cf8b b8fc3975b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 13:41:00 2009 -0700
 
@@ -62472,7 +62768,7 @@ Date:   Sat Oct 10 13:39:01 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 22856cf8bb0f5e1f37c9b774132d9ef6934526ed
-Merge: 2f760349 e29961fd
+Merge: 2f7603490 e29961fdb
 Author: Keith Packard <keithp@keithp.com>
 Date:   Sat Oct 10 11:44:20 2009 -0700
 
@@ -62541,7 +62837,7 @@ Date:   Mon Sep 21 11:00:32 2009 -0700
     update changelogs for Debian build
 
 commit 327c64305a59f48ababf19875874a550af6b9cef
-Merge: c8a81a41 74f0fb4d
+Merge: c8a81a419 74f0fb4dd
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Sep 21 11:00:22 2009 -0700
 
@@ -62572,7 +62868,7 @@ Date:   Sun Sep 20 09:21:00 2009 -0600
     update changelogs for Debian build
 
 commit df42ccaaf468cdc5d93cbd1c001f58df58419722
-Merge: 0b24e403 078e9cdb
+Merge: 0b24e4034 078e9cdbd
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 20 09:19:28 2009 -0600
 
@@ -62668,7 +62964,7 @@ Date:   Sun Sep 6 17:46:39 2009 -0600
     update changelogs for Debian build
 
 commit 37e6c9a492a1d51373bf9333fb3172e0c377720f
-Merge: d256f820 2e6686b1
+Merge: d256f8204 2e6686b1e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 17:46:10 2009 -0600
 
@@ -62681,7 +62977,7 @@ Date:   Sun Sep 6 16:45:47 2009 -0700
     Use plplotd instead of plplotd-gnome2
 
 commit d256f8204e9fce53ae4309562bb4c0cde1fae43e
-Merge: 0fc344df 32d35367
+Merge: 0fc344dfc 32d353670
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 17:34:08 2009 -0600
 
@@ -62704,7 +63000,7 @@ Date:   Sun Sep 6 14:15:57 2009 -0600
     update changelogs for Debian build
 
 commit 4b0de757874c0ecaf38e3dfd3beefc398150e3d5
-Merge: 773c4ffb d0eac989
+Merge: 773c4ffbc d0eac989b
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 14:15:53 2009 -0600
 
@@ -62737,7 +63033,7 @@ Date:   Sun Sep 6 14:05:55 2009 -0600
     update changelogs for Debian build
 
 commit 45ede4a4b203ef9da5bf05c49cb9c5a2e6382ec5
-Merge: 45e29381 e35e485f
+Merge: 45e293812 e35e485ff
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 14:05:51 2009 -0600
 
@@ -62760,7 +63056,7 @@ Date:   Sun Sep 6 14:02:14 2009 -0600
     update changelogs for Debian build
 
 commit d42ebf0661ecf15455e5051de1e16ae66f8dd857
-Merge: 384dbe9f 7a19aac5
+Merge: 384dbe9fc 7a19aac5e
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 14:02:09 2009 -0600
 
@@ -62785,7 +63081,7 @@ Date:   Sun Sep 6 10:40:06 2009 -0600
     update changelogs for Debian build
 
 commit 35c54b3a278fa9bc2bc7f4b5ee04866697c93ba0
-Merge: 4f8eff74 6d018ab9
+Merge: 4f8eff740 6d018ab93
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Sun Sep 6 10:39:23 2009 -0600
 
@@ -62935,7 +63231,7 @@ Date:   Wed Sep 2 23:18:15 2009 -0600
     update changelogs for Debian build
 
 commit cb4a73f3b65ba72f645fd37ab8712829c9537bf8
-Merge: 9ddd8696 e2e449d5
+Merge: 9ddd8696b e2e449d5c
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Sep 2 23:17:37 2009 -0600
 
@@ -63011,7 +63307,7 @@ Date:   Mon Aug 31 16:26:00 2009 -0600
     update changelogs for Debian build
 
 commit b34474c1f3083e73b7184d519f54d4c8031836fd
-Merge: 8df16979 0d65bff4
+Merge: 8df169791 0d65bff44
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Mon Aug 31 16:25:32 2009 -0600
 
@@ -63079,7 +63375,7 @@ Date:   Wed Aug 19 00:52:57 2009 -0600
     update changelogs for Debian build
 
 commit 4486d9156e19e4280b42bcd422d81d04f2d04a92
-Merge: dd09f0bc 33edd629
+Merge: dd09f0bc2 33edd6299
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Wed Aug 19 00:49:24 2009 -0600
 
@@ -63121,7 +63417,7 @@ Date:   Tue Aug 18 21:49:39 2009 -0600
     add support for building Debian package
 
 commit d996aa9b32fb0eb385bd3d158256c29788a42fe3
-Merge: b3b2d3c4 7d4ceb75
+Merge: b3b2d3c47 7d4ceb75a
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 18:56:09 2009 -0600
 
@@ -63138,7 +63434,7 @@ Date:   Tue Aug 18 17:55:22 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit b3b2d3c475a135084b5628c730fc6fca1ba0817b
-Merge: 4685fc54 da12b89f
+Merge: 4685fc541 da12b89fb
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 18:36:03 2009 -0600
 
@@ -63157,7 +63453,7 @@ Date:   Tue Aug 18 17:29:29 2009 -0700
     Fix ao-bitbang examples to not have . in the first column
 
 commit 4685fc541466afbeefc151bcb64cd054739c048b
-Merge: 1c2a0b66 c29275b7
+Merge: 1c2a0b665 c29275b72
 Author: Bdale Garbee <bdale@gag.com>
 Date:   Tue Aug 18 18:09:38 2009 -0600
 
@@ -63657,7 +63953,7 @@ Date:   Thu Jun 4 11:20:10 2009 -0700
     Signed-off-by: Keith Packard <keithp@keithp.com>
 
 commit 17d2432a8b9c15963cd3b821f025ad33972ef477
-Merge: 210dbaa2 8a9a3f02
+Merge: 210dbaa23 8a9a3f02b
 Author: Keith Packard <keithp@keithp.com>
 Date:   Thu Jun 4 11:13:15 2009 -0700
 
