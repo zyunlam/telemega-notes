@@ -69,7 +69,7 @@ main(void)
 
 	/* set up the input we watch to sense SOM "health" */
 	/* choosing pull down so SOM has to actually assert readiness */
-	ao_enable_input(HEALTH_PORT, HEALTH_PIN, AO_EXTI_MODE_PULL_DOWN);
+	ao_enable_input(HEALTH_PORT, HEALTH_PIN, 0);
 
 	ao_adc_init();
 
