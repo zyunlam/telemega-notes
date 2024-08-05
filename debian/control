@@ -35,6 +35,7 @@ Build-Depends: asciidoctor,
 	       cairo-5c,
                pkg-config,
                shared-mime-info,
+               sox,
                swig
 Standards-Version: 4.6.0
 Homepage: http://altusmetrum.org/AltOS
