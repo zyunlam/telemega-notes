@@ -170,6 +170,15 @@
 	|8MB
 	|-
 	|3.7V
+
+	|EasyMega v3.0
+	|MS5607 30km (100k')
+	|ADXL375 200g
+	|-
+	|BMI088 MMC5983A
+	|8MB
+	|-
+	|3.7V
 	endif::easymega[]
 
 	ifdef::easytimer[]
