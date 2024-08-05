@@ -3,11 +3,12 @@ vpath %.c ..:../kernel:../drivers:../util:../micropeak:../aes:../product
 vpath %.h ..:../kernel:../drivers:../util:../micropeak:../aes:../product
 vpath make-kalman ..:../kernel:../drivers:../util:../micropeak:../aes:../product
 
-PROGS=ao_flight_test ao_flight_test_baro ao_flight_test_accel ao_flight_test_noisy_accel ao_flight_test_mm \
+PROGS=ao_flight_test_mm \
 	ao_flight_test_metrum ao_flight_test_mini \
 	ao_gps_test ao_gps_test_skytraq ao_gps_test_ublox ao_convert_test ao_convert_pa_test ao_fec_test \
 	ao_aprs_test ao_micropeak_test ao_fat_test ao_aes_test ao_int64_test \
-	ao_ms5607_convert_test ao_quaternion_test
+	ao_ms5607_convert_test ao_quaternion_test \
+	ao_flight_test_tmega4
 
 INCS=ao_kalman.h ao_ms5607.h ao_log.h ao_data.h altitude-pa.h altitude.h ao_quaternion.h ao_eeprom_read.h
 TEST_SRC=ao_flight_test.c
@@ -16,7 +17,7 @@ TEST_LIB=-ljson-c
 
 KALMAN=make-kalman 
 
-CFLAGS=-I.. -I. -I../kernel -I../drivers -I../micropeak -I../product -I../lisp -O0 -g -Wall -DAO_LISP_TEST -no-pie
+CFLAGS=-I.. -I. -I../kernel -I../drivers -I../product -I../lisp -O0 -g -Wall -DAO_LISP_TEST -no-pie
 
 all: $(PROGS) ao_aprs_data.wav
 
@@ -39,6 +40,9 @@ ao_flight_test_accel: $(TEST_SRC_ALL) ao_host.h ao_flight.c  ao_sample.c ao_kalm
 
 ao_flight_test_mm: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
 	cc -DTELEMEGA=1 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
+
+ao_flight_test_tmega4: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
+	cc -DTELEMEGA_V4=1 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
 
 ao_flight_test_metrum: $(TEST_SRC_ALL) ao_host.h ao_flight.c ao_sample.c ao_kalman.c ao_pyro.c ao_pyro.h $(INCS)
 	cc -DTELEMETRUM_V2=1 $(CFLAGS) -o $@ $(TEST_SRC)  $(TEST_LIB) -lm
@@ -86,7 +90,7 @@ ao_micropeak_test: ao_micropeak_test.c ao_microflight.c ao_kalman.h
 	cc $(CFLAGS) -o $@ ao_micropeak_test.c -lm
 
 ao_fat_test: ao_fat_test.c ao_fat.c ao_bufio.c
-	cc $(CFLAGS) -o $@ ao_fat_test.c -lssl -lcrypto
+	cc $(CFLAGS) -o $@ ao_fat_test.c -Wno-deprecated-declarations -lssl -lcrypto
 
 ao_aes_test: ao_aes_test.c ao_aes.c ao_aes_tables.c
 	cc $(CFLAGS) -o $@ ao_aes_test.c

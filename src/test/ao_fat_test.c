@@ -485,7 +485,7 @@ long_test_fs(void)
 		}
 	}
 
-	printf ("\n   **** Write IO: read %llu write %llu data sectors %llu\n", total_reads, total_writes, (total_file_size + 511) / 512);
+	printf ("\n   **** Write IO: read %lu write %lu data sectors %lu\n", total_reads, total_writes, (total_file_size + 511) / 512);
 
 	check_bufio("all files created");
 	printf ("   **** All done creating files\n");
@@ -518,7 +518,7 @@ long_test_fs(void)
 			check_bufio("file shown");
 		}
 	}
-	printf ("\n  **** Read IO: read %llu write %llu\n", total_reads, total_writes);
+	printf ("\n  **** Read IO: read %lu write %lu\n", total_reads, total_writes);
 }
 
 char *params[] = {

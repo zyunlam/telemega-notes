@@ -123,13 +123,6 @@ public class AltosConfigFCUI
 		"0", "5", "10", "15", "20"
 	};
 
-	static String[] 	ignite_mode_values = {
-		"Dual Deploy",
-		"Redundant Apogee",
-		"Redundant Main",
-		"Separation & Apogee",
-	};
-
 	static String[] 	aprs_interval_values = {
 		"Disabled",
 		"2",
@@ -152,16 +145,6 @@ public class AltosConfigFCUI
 		"3750",
 		"4000",
 		"4250",
-	};
-
-	static String[] 	pad_orientation_values_radio = {
-		"Antenna Up",
-		"Antenna Down",
-	};
-
-	static String[] 	pad_orientation_values_no_radio = {
-		"Beeper Up",
-		"Beeper Down",
 	};
 
 	String[] pad_orientation_values;
@@ -328,11 +311,7 @@ public class AltosConfigFCUI
 	}
 
 	void set_pad_orientation_values() {
-		String [] new_values;
-		if (has_radio())
-			new_values = pad_orientation_values_radio;
-		else
-			new_values = pad_orientation_values_no_radio;
+		String [] new_values = AltosLib.pad_orientation_values(has_radio());
 		if (new_values != pad_orientation_values) {
 			int id = pad_orientation_value.getSelectedIndex();
 			pad_orientation_value.removeAllItems();
@@ -893,7 +872,7 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		ignite_mode_value = new JComboBox<String>(ignite_mode_values);
+		ignite_mode_value = new JComboBox<String>(AltosLib.ignite_mode_values);
 		ignite_mode_value.setEditable(false);
 		ignite_mode_value.addItemListener(this);
 		pane.add(ignite_mode_value, c);
@@ -919,7 +898,7 @@ public class AltosConfigFCUI
 		c.anchor = GridBagConstraints.LINE_START;
 		c.insets = ir;
 		c.ipady = 5;
-		pad_orientation_values = pad_orientation_values_no_radio;
+		pad_orientation_values = AltosLib.pad_orientation_values(false);
 
 		pad_orientation_value = new JComboBox<String>(pad_orientation_values);
 		pad_orientation_value.setEditable(false);
@@ -1453,7 +1432,7 @@ public class AltosConfigFCUI
 
 	public void set_ignite_mode(int new_ignite_mode) {
 		if (new_ignite_mode != AltosLib.MISSING) {
-			if (new_ignite_mode >= ignite_mode_values.length)
+			if (new_ignite_mode >= AltosLib.ignite_mode_values.length)
 				new_ignite_mode = 0;
 			if (new_ignite_mode < 0) {
 				ignite_mode_value.setEnabled(false);

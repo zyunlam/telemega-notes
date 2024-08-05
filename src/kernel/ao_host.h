@@ -81,12 +81,20 @@ struct ao_task {
 	int dummy;
 };
 
+enum ao_igniter_status {
+	ao_igniter_unknown,	/* unknown status (ambiguous voltage) */
+	ao_igniter_ready,	/* continuity detected */
+	ao_igniter_active,	/* igniter firing */
+	ao_igniter_open,	/* open circuit detected */
+};
+
 #define ao_add_task(t,f,n)
 
 #define ao_log_start()
 #define ao_log_stop()
 
 #define AO_MS_TO_TICKS(ms)	((ms) / 10)
+#define AO_NS_TO_TICKS(ns)	((ns) / (10000000L))
 #define AO_SEC_TO_TICKS(s)	((s) * 100)
 
 #define AO_FLIGHT_TEST

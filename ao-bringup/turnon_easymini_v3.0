@@ -18,8 +18,8 @@ else
 	exit 1
 fi
 
-VERSION=3
-PRODUCT=EasyMotor
+VERSION=3.0
+PRODUCT=EasyMini
 BASE=`echo $PRODUCT | tr 'A-Z' 'a-z'`
 echo $FILE
 
@@ -29,7 +29,6 @@ echo
 echo "Expectations:"
 echo "\t$PRODUCT v$VERSION powered from USB"
 echo "\t\twith ST-Link-V2 cabled to debug header"
-echo "\t\tand precision 2:1 resistor divider feeding pressure input from 5V out"
 echo
 
 case $# in
@@ -46,11 +45,12 @@ case $# in
 	exit 1;
 	;;
 esac
+
 #
 # Use released versions of everything
 #
-FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymotor-v3-altos-flash-*.elf
-ALTOS_FILE=~/altusmetrumllc/Binaries/easymotor-v3-*.elf
+FLASH_FILE=~/altusmetrumllc/Binaries/loaders/easymini-v3.0-altos-flash-*.elf
+ALTOS_FILE=~/altusmetrumllc/Binaries/easymini-v3.0-*.elf
 
 echo $FLASH_LPC $FLASH_FILE
 
@@ -62,32 +62,8 @@ echo $USBLOAD $ALTOS_FILE
 
 $USBLOAD --serial=$SERIAL $ALTOS_FILE || exit 1
 
-sleep 2
-
-dev=`ao-list | awk '/EasyMotor-v'"$VERSION"'/ { print $3; exit(0); }'`
-
-case "$dev" in
-/dev/tty*)
-	echo "EasyMotor found on $dev"
-	;;
-*)
-	echo 'No EasyMotor-v'"$VERSION"' found'
-	exit 1
-	;;
-esac
-
-echo 'E 0' > $dev
-
-failed=1
-while [ $failed = 1 ]; do
-    ../ao-tools/ao-cal-accel/ao-cal-accel $dev
-    failed=$?
-done
-
-echo 'E 1' > $dev
-
 sleep 1
 
-./test-easymotor-v3
+./test-easymini-v3.0
 
 exit $?

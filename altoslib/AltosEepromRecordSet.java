@@ -138,6 +138,8 @@ public class AltosEepromRecordSet implements AltosRecordSet {
 			} else {
 				while (t < tick - 32767)
 					t += 65536;
+				while (t > tick + 32767)
+					t -= 65536;
 				tick = t;
 			}
 			record.wide_tick = tick;

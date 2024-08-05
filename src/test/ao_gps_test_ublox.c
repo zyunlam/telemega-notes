@@ -17,12 +17,15 @@
  */
 
 #define AO_GPS_TEST
+#define AO_TICK_TYPE uint32_t
 #define HAS_GPS	1
+#define ao_tick_count 0
 #include "ao_host.h"
 #include <termios.h>
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdbool.h>
 #include <fcntl.h>
 #include <unistd.h>
 #define AO_GPS_NUM_SAT_MASK	(0xf << 0)

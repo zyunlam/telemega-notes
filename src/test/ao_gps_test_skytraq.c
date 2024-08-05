@@ -17,7 +17,9 @@
  */
 
 #define AO_GPS_TEST
+#define AO_TICK_TYPE uint32_t
 #define HAS_GPS 1
+#define tick_count 0
 #include "ao_host.h"
 #include <termios.h>
 #include <errno.h>
@@ -49,6 +51,8 @@ struct ao_gps_orig {
 	int16_t			altitude;	/* m */
 	uint16_t		ground_speed;	/* cm/s */
 	uint8_t			course;		/* degrees / 2 */
+	uint8_t			pdop;		/* unused */
+	uint8_t			vdop;		/* unused */
 	uint8_t			hdop;		/* * 5 */
 	int16_t			climb_rate;	/* cm/s */
 	uint16_t		h_error;	/* m */

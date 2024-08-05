@@ -23,5 +23,5 @@ Because documentation is just as prone as software to contain "bugs", and
 can always be improved...  If you have questions that aren't answered in this 
 manual, or just need a little help figuring things out, we strongly suggest 
 joining the Altus Metrum user email list, which you can do by visiting 
-https://lists.gag.com/mailman/listinfo/altusmetrum.
+https://groups.io/g/altusmetrum.
 

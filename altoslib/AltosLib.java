@@ -235,6 +235,30 @@ public class AltosLib {
 		"Compressed", "Uncompressed"
 	};
 
+	public static final String[] ignite_mode_values = {
+		"Dual Deploy",
+		"Redundant Apogee",
+		"Redundant Main",
+		"Separation & Apogee",
+	};
+
+	public static final String[] 	pad_orientation_values_radio = {
+		"Antenna Up",
+		"Antenna Down",
+	};
+
+	public static final String[] 	pad_orientation_values_no_radio = {
+		"Beeper Up",
+		"Beeper Down",
+	};
+
+	public static String[] pad_orientation_values(boolean radio) {
+		if (radio)
+			return pad_orientation_values_radio;
+		else
+			return pad_orientation_values_no_radio;
+	}
+
 	public static final String launch_sites_url = "https://maps.altusmetrum.org/launch-sites.txt";
 	public static final String launch_sites_env = "LAUNCH_SITES";
 //	public static final String launch_sites_url = "file:///home/keithp/misc/text/altusmetrum/AltOS/launch-sites.txt";

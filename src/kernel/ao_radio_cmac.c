@@ -76,6 +76,8 @@ radio_cmac_send(uint8_t len)
  * Receive and validate an incoming packet
  */
 
+int8_t	ao_radio_cmac_last_rssi;
+
 static int8_t
 radio_cmac_recv(uint8_t len, AO_TICK_TYPE timeout) 
 {
@@ -91,6 +93,8 @@ radio_cmac_recv(uint8_t len, AO_TICK_TYPE timeout)
 		ao_radio_cmac_rssi = 0;
 		return AO_RADIO_CMAC_TIMEOUT;
 	}
+
+	ao_radio_cmac_last_rssi = ao_radio_rssi;
 
 	if (!(cmac_data[len + AO_CMAC_KEY_LEN +1] & AO_RADIO_STATUS_CRC_OK))
 		return AO_RADIO_CMAC_CRC_ERROR;

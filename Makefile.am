@@ -49,6 +49,7 @@ fat_android = \
 fat_altos = \
 	src/easymega-v1.0/easymega-v1.0-$(VERSION).ihx \
 	src/easymega-v2.0/easymega-v2.0-$(VERSION).ihx \
+	src/easymega-v3.0/easymega-v3.0-$(VERSION).ihx \
 	src/easymini-v1.0/easymini-v1.0-$(VERSION).ihx \
 	src/easymini-v2.0/easymini-v2.0-$(VERSION).ihx \
 	src/easymini-v3.0/easymini-v3.0-$(VERSION).ihx \
