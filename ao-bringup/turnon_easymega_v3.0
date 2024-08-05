@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# EasyTimer v2 all arrive from the assembler with 
-# the bootloader already flashed. 
+PRODUCT=EasyMega
+VERSION=3.0
+REPO=~/altusmetrumllc/Binaries
 
 if [ -x /usr/bin/ao-usbload ]; then
 	USBLOAD=/usr/bin/ao-usbload
@@ -10,15 +11,12 @@ else
 	exit 1
 fi
 
-VERSION=2
-REPO=~/altusmetrumllc/Binaries
-PRODUCT=EasyTimer
-
 echo "$PRODUCT v$VERSION Turn-On and Calibration Program"
 echo "Copyright 2024 by Bdale Garbee.  Released under GPL v3"
 echo
 echo "Expectations:"
-echo "\t$PRODUCT v$VERSION powered from USB"
+echo "\t$PRODUCT v$VERSION"
+echo "\t\twith USB cable attached"
 echo
 
 case $# in
@@ -36,18 +34,18 @@ case $# in
 	;;
 esac
 
-$USBLOAD --serial=$SERIAL --force $REPO/easytimer-v$VERSION*.elf || exit 1
+$USBLOAD --serial=$SERIAL $REPO/easymega-v$VERSION*.elf || exit 1
 
 sleep 5
 
-dev=`ao-list | awk '/EasyTimer-v'"$VERSION"'/ { print $3; exit(0); }'`
+dev=`ao-list | awk '/'"$PRODUCT"'-v'"$VERSION"'/ { print $3; exit(0); }'`
 
 case "$dev" in
 /dev/tty*)
-	echo "EasyTimer found on $dev"
+	echo "$PRODUCT found on $dev"
 	;;
 *)
-	echo 'No EasyTimer-v'"$VERSION"' found'
+	echo 'No '"$PRODUCT"'-v'"$VERSION"' found'
 	exit 1
 	;;
 esac
@@ -55,13 +53,13 @@ esac
 echo 'E 0' > $dev
 
 failed=1
-while [ $failed = 1 ]; do
+while [ $failed =  1 ]; do
     ../ao-tools/ao-cal-accel/ao-cal-accel $dev
     failed=$?
 done
 
 echo 'E 1' > $dev
 
-./test-easytimer-v2
+./test-easymega-v3.0
 
 exit $?

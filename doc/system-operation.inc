@@ -23,7 +23,10 @@
 		have an
 		accelerometer we can use to determine orientation, “idle” mode
 		is selected if the board is connected via USB to a computer,
-		otherwise the board enters “flight” mode.
+		otherwise the board enters “flight” mode.  This is also how
+		EasyMotor works, since even though it has an accelerometer,
+		it detects the motor burn it is meant to record by detecting		a rise in chamber pressure, and board orientation doesn't 
+		matter.
 		ifdef::telemini[]
 		TeleMini
 		selects “idle” mode if it receives a command packet

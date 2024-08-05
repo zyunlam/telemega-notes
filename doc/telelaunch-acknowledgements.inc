@@ -1,7 +1,8 @@
 [dedication]
 == Acknowledgments
 
-	Our profound thanks to Terry Lee for major contributions to making 
+	Our profound thanks to Terry Lee (TRA #10206, NAR #3284) for major
+        contributions to making
 	the TeleLaunch system something we could actually package and sell!
 
 	Tripoli Colorado, Oregon Rocketry, New River Valley Rocketry, and 

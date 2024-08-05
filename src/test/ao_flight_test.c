@@ -28,6 +28,20 @@
 #include <math.h>
 #define log ao_log_data
 
+#define AO_TICK_TYPE	uint32_t
+#define AO_TICK_SIGNED	int32_t
+
+typedef int32_t pres_t;
+#define pres_to_altitude(p) ao_pa_to_altitude(p)
+#define ao_data_pres_cook(packet) ao_ms5607_convert(&packet->ms5607_raw, &packet->ms5607_cooked)
+#define ao_data_pres(packet) ((packet)->ms5607_cooked.pres)
+#define AO_ADC_MAX	4095
+#define AO_PYRO_BATTERY_DIV_PLUS	100
+#define AO_PYRO_BATTERY_DIV_MINUS	27
+#define AO_IGNITE_DIV_PLUS	100
+#define AO_IGNITE_DIV_MINUS	27
+#define AO_ADC_REFERENCE_DV	33
+
 #define GRAVITY 9.80665
 
 #define AO_HERTZ	100
@@ -48,7 +62,7 @@
 
 int ao_gps_new;
 
-#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2) && !defined(EASYMINI) && !defined(EASYMOTOR_V_2)
+#if !defined(TELEMEGA) && !defined(TELEMETRUM_V2) && !defined(EASYMINI) && !defined(EASYMOTOR_V_2) && !defined(TELEMEGA_V4)
 #define TELEMETRUM_V1 1
 #endif
 
@@ -69,6 +83,49 @@ struct ao_adc {
 	int16_t			v_pbatt;
 	int16_t			temp;
 };
+#endif
+
+#if TELEMEGA_V4
+#define AO_ADC_NUM_SENSE	6
+#define HAS_MS5607		1
+#define HAS_BMX160		1
+#define HAS_ADXL375		1
+#define AO_ADXL375_INVERT	1
+#define AO_ADXL375_AXIS		x
+#define HAS_BEEP		1
+#define HAS_BARO		1
+#define AO_CONFIG_MAX_SIZE	1024
+
+struct ao_adc {
+	int16_t			sense[AO_ADC_NUM_SENSE];
+	int16_t			v_batt;
+	int16_t			v_pbatt;
+	int16_t			temp;
+};
+
+#define ao_data_along(packet)	((packet)->bmx160.acc_x)
+#define ao_data_across(packet)	(-(packet)->bmx160.acc_y)
+#define ao_data_through(packet)	((packet)->bmx160.acc_z)
+
+#define ao_data_roll(packet)	((packet)->bmx160.gyr_x)
+#define ao_data_pitch(packet)	(-(packet)->bmx160.gyr_y)
+#define ao_data_yaw(packet)	((packet)->bmx160.gyr_z)
+
+#define ao_data_mag_along(packet)	((packet)->bmx160.mag_x)
+#define ao_data_mag_across(packet)	((packet)->bmx160.mag_y)
+#define ao_data_mag_through(packet)	((packet)->bmx160.mag_z)
+
+#define ao_data_set_along(packet,v)	((packet)->bmx160.acc_x = (v))
+#define ao_data_set_across(packet,v)	((packet)->bmx160.acc_y = -(v))
+#define ao_data_set_through(packet,v)	((packet)->bmx160.acc_z = (v))
+
+#define ao_data_set_roll(packet,v)	((packet)->bmx160.gyr_x = (v))
+#define ao_data_set_pitch(packet,v)	((packet)->bmx160.gyr_y = -(v))
+#define ao_data_set_yaw(packet,v)	((packet)->bmx160.gyr_z = (v))
+
+#define ao_data_set_mag_along(packet,v)	((packet)->bmx160.mag_x = (v))
+#define ao_data_set_mag_across(packet,v)	((packet)->bmx160.mag_y = (v))
+#define ao_data_set_mag_through(packet,v)	((packet)->bmx160.mag_z = (v))
 #endif
 
 #if TELEMETRUM_V2
@@ -149,7 +206,7 @@ struct ao_adc {
 #define HAS_USB 1
 #define HAS_GPS 1
 
-int16_t
+AO_TICK_TYPE
 ao_time(void);
 
 void
@@ -158,12 +215,19 @@ ao_dump_state(void);
 #define ao_tick_count	(ao_time())
 #define ao_wakeup(wchan) ao_dump_state()
 
+enum ao_igniter_status {
+	ao_igniter_unknown,	/* unknown status (ambiguous voltage) */
+	ao_igniter_ready,	/* continuity detected */
+	ao_igniter_active,	/* igniter firing */
+	ao_igniter_open,	/* open circuit detected */
+};
+
 #include <ao_data.h>
 #include <ao_log.h>
 #include <ao_telemetry.h>
 #include <ao_sample.h>
 
-#if TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 int ao_gps_count;
 struct ao_telemetry_location ao_gps_first;
 struct ao_telemetry_location ao_gps_prev;
@@ -289,12 +353,12 @@ double	drogue_time;
 int	main_height;
 double	main_time;
 
-int	tick_offset;
+uint32_t	tick_offset;
 
 static ao_k_t	ao_k_height;
 static double	simple_speed;
 
-int16_t
+AO_TICK_TYPE
 ao_time(void)
 {
 	return ao_data_static.tick;
@@ -360,12 +424,12 @@ struct ao_cmds {
 };
 
 #define AO_NEED_ALTITUDE_TO_PRES 1
-#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
+#if TELEMEGA || TELEMETRUM_V2 || EASYMINI || TELEMEGA_V4
 #include "ao_convert_pa.c"
 #include <ao_ms5607.h>
 struct ao_ms5607_prom	ao_ms5607_prom;
 #include "ao_ms5607_convert.c"
-#if TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 #define AO_PYRO_NUM	4
 #include <ao_pyro.h>
 #endif
@@ -388,7 +452,7 @@ extern int16_t ao_accel_2g;
 typedef int16_t	accel_t;
 
 uint16_t	ao_serial_number;
-int16_t		ao_flight_number;
+uint16_t	ao_flight_number;
 
 extern AO_TICK_TYPE	ao_sample_tick;
 
@@ -406,6 +470,7 @@ double ao_sample_qangle;
 
 AO_TICK_TYPE	ao_sample_prev_tick;
 AO_TICK_TYPE	prev_tick;
+AO_TICK_TYPE	start_tick;
 
 
 #include "ao_kalman.c"
@@ -413,7 +478,7 @@ AO_TICK_TYPE	prev_tick;
 #include "ao_sample.c"
 #include "ao_flight.c"
 #include "ao_data.c"
-#if TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 #define AO_PYRO_NUM	4
 
 #define AO_PYRO_0	0
@@ -426,7 +491,6 @@ AO_TICK_TYPE	prev_tick;
 static void
 ao_pyro_pin_set(uint8_t pin, uint8_t value)
 {
-	printf ("set pyro %d %d\n", pin, value);
 }
 
 #include "ao_pyro.c"
@@ -458,6 +522,9 @@ static uint16_t	pyros_fired;
 
 #if HAS_MPU6000
 static struct ao_mpu6000_sample	ao_ground_mpu6000;
+#endif
+#if HAS_BMX160
+static struct ao_bmx160_sample	ao_ground_bmx160;
 #endif
 
 void
@@ -497,7 +564,7 @@ ao_test_exit(void)
 	exit(0);
 }
 
-#ifdef TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 struct ao_azel {
 	int	az;
 	int	el;
@@ -529,9 +596,9 @@ ao_insert(void)
 #endif
 
 		(void) accel;
-		if (!tick_offset)
-			tick_offset = -ao_data_static.tick;
-		if ((prev_tick - ao_data_static.tick) > 0x400)
+		if (!start_tick)
+			start_tick = ao_data_static.tick;
+		if ((AO_TICK_SIGNED) (prev_tick - ao_data_static.tick) > 0x400)
 			tick_offset += 65536;
 		if (prev_tick) {
 			int ticks = ao_data_static.tick - prev_tick;
@@ -540,11 +607,11 @@ ao_insert(void)
 			simple_speed += accel * ticks / 100.0;
 		}
 		prev_tick = ao_data_static.tick;
-		time = (double) (ao_data_static.tick + tick_offset) / 100;
+		time = (double) (ao_data_static.tick + tick_offset - start_tick) / 100;
 
 		double height = 0;
 #if HAS_BARO
-#if TELEMEGA || TELEMETRUM_V2 || EASYMINI
+#if TELEMEGA || TELEMETRUM_V2 || EASYMINI || TELEMEGA_V4
 		ao_ms5607_convert(&ao_data_static.ms5607_raw, &ao_data_static.ms5607_cooked);
 		height = ao_pa_to_altitude(ao_data_static.ms5607_cooked.pres) - ao_ground_height;
 
@@ -589,7 +656,7 @@ ao_insert(void)
 		}
 
 		if (!ao_summary) {
-#if TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 			static struct ao_quaternion	ao_ground_mag;
 			static int			ao_ground_mag_set;
 
@@ -680,10 +747,10 @@ ao_insert(void)
 #if 1
 			printf("%7.2f height %8.2f accel %8.3f accel_speed %8.3f "
 			       "state %d k_height %8.2f k_speed %8.3f k_accel %8.3f avg_height %5d drogue %4d main %4d error %5d"
-#if TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 			       " angle %5d "
 			       "accel_x %8.3f accel_y %8.3f accel_z %8.3f gyro_x %8.3f gyro_y %8.3f gyro_z %8.3f mag_x %8d mag_y %8d, mag_z %8d mag_angle %4d "
-			       "avg_accel %8.3f "
+			       "avg_accel %8.3f pyro %d inhibited %d"
 #endif
 			       "\n",
 			       time,
@@ -711,7 +778,26 @@ ao_insert(void)
 			       ao_data_static.hmc5883.y,
 			       ao_data_static.hmc5883.z,
 			       ao_mag_angle,
-			       ao_coast_avg_accel / 16.0
+			       ao_coast_avg_accel / 16.0,
+			       ao_pyro_fired * 10,
+			       ao_pyro_inhibited * 10
+#endif
+#if TELEMEGA_V4
+			       , ao_sample_orient,
+
+			       ao_bmx160_accel(ao_data_static.bmx160.acc_x),
+			       ao_bmx160_accel(ao_data_static.bmx160.acc_y),
+			       ao_bmx160_accel(ao_data_static.bmx160.acc_z),
+			       ao_bmx160_gyro(ao_data_static.bmx160.gyr_x - ao_ground_bmx160.gyr_x),
+			       ao_bmx160_gyro(ao_data_static.bmx160.gyr_y - ao_ground_bmx160.gyr_y),
+			       ao_bmx160_gyro(ao_data_static.bmx160.gyr_z - ao_ground_bmx160.gyr_z),
+			       ao_data_static.bmx160.mag_x,
+			       ao_data_static.bmx160.mag_y,
+			       ao_data_static.bmx160.mag_z,
+			       ao_mag_angle,
+			       ao_coast_avg_accel / 16.0,
+			       ao_pyro_fired * 10,
+			       ao_pyro_inhibited * 10
 #endif
 				);
 #endif
@@ -769,7 +855,7 @@ void
 ao_sleep(void *wchan)
 {
 	if (wchan == &ao_data_head) {
-#if TELEMEGA
+#if TELEMEGA || TELEMEGA_V4
 		if (ao_flight_state >= ao_flight_boost && ao_flight_state < ao_flight_landed)
 			ao_pyro_check();
 #endif
@@ -779,6 +865,9 @@ ao_sleep(void *wchan)
 
 #if TELEMEGA
 				ao_data_static.mpu6000 = ao_ground_mpu6000;
+#endif
+#if TELEMEGA_V4
+				ao_data_static.bmx160 = ao_ground_bmx160;
 #endif
 #if TELEMETRUM_V1
 				ao_data_static.adc.accel = ao_flight_ground_accel;
@@ -792,7 +881,7 @@ ao_sleep(void *wchan)
 			}
 
 			if (eeprom) {
-#if TELEMEGA || EASYMOTOR_V_2
+#if TELEMEGA || EASYMOTOR_V_2 || TELEMEGA_V4
 				struct ao_log_mega	*log_mega;
 #endif
 #if EASYMOTOR_V_2
@@ -889,6 +978,102 @@ ao_sleep(void *wchan)
 						break;
 					case AO_LOG_GPS_SAT:
 						break;
+					}
+					break;
+#endif
+#if TELEMEGA_V4
+				case AO_LOG_FORMAT_TELEMEGA_4:
+					log_mega = (struct ao_log_mega *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_mega);
+					switch (log_mega->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_number = log_mega->u.flight.flight;
+						ao_flight_ground_accel = log_mega->u.flight.ground_accel;
+						ao_flight_started = 1;
+						ao_ground_pres = log_mega->u.flight.ground_pres;
+						ao_ground_height = ao_pa_to_altitude(ao_ground_pres);
+						ao_ground_accel_along = log_mega->u.flight.ground_accel_along;
+						ao_ground_accel_across = log_mega->u.flight.ground_accel_across;
+						ao_ground_accel_through = log_mega->u.flight.ground_accel_through;
+						ao_ground_roll = log_mega->u.flight.ground_roll;
+						ao_ground_pitch = log_mega->u.flight.ground_pitch;
+						ao_ground_yaw = log_mega->u.flight.ground_yaw;
+						ao_ground_bmx160.acc_x = ao_ground_accel_along;
+						ao_ground_bmx160.acc_y = -ao_ground_accel_across;
+						ao_ground_bmx160.acc_z = ao_ground_accel_through;
+						ao_ground_bmx160.gyr_x = ao_ground_roll >> 9;
+						ao_ground_bmx160.gyr_y = -(ao_ground_pitch >> 9);
+						ao_ground_bmx160.gyr_z = ao_ground_yaw >> 9;
+						break;
+					case AO_LOG_STATE:
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_mega->tick;
+						ao_data_static.ms5607_raw.pres = log_mega->u.sensor.pres;
+						ao_data_static.ms5607_raw.temp = log_mega->u.sensor.temp;
+						ao_data_set_along(&ao_data_static, log_mega->u.sensor.accel_along);
+						ao_data_set_across(&ao_data_static, log_mega->u.sensor.accel_across);
+						ao_data_set_through(&ao_data_static, log_mega->u.sensor.accel_through);
+						ao_data_set_roll(&ao_data_static, log_mega->u.sensor.gyro_roll);
+						ao_data_set_pitch(&ao_data_static, log_mega->u.sensor.gyro_pitch);
+						ao_data_set_yaw(&ao_data_static, log_mega->u.sensor.gyro_yaw);
+						ao_data_set_mag_along(&ao_data_static, log_mega->u.sensor.mag_along);
+						ao_data_set_mag_across(&ao_data_static, log_mega->u.sensor.mag_across);
+						ao_data_set_mag_through(&ao_data_static, log_mega->u.sensor.mag_through);
+#if AO_ADXL375_INVERT
+						ao_data_static.adxl375.AO_ADXL375_AXIS = ao_data_accel_invert(log_mega->u.sensor.accel);
+#else
+						ao_data_static.adxl375.AO_ADXL375_AXIS = log_mega->u.sensor.accel;
+#endif
+						if (ao_config.pad_orientation != AO_PAD_ORIENTATION_ANTENNA_UP)
+							ao_data_static.adxl375.AO_ADXL375_AXIS = ao_data_accel_invert(ao_data_static.adxl375.AO_ADXL375_AXIS);
+						ao_records_read++;
+						ao_insert();
+						return;
+					case AO_LOG_TEMP_VOLT:
+						if (pyros_fired != log_mega->u.volt.pyro) {
+							printf("pyro changed %x -> %x\n", pyros_fired, log_mega->u.volt.pyro);
+							pyros_fired = log_mega->u.volt.pyro;
+						}
+						break;
+					case AO_LOG_GPS_TIME:
+						ao_gps_prev = ao_gps_static;
+						ao_gps_static.tick = log_mega->tick;
+						ao_gps_static.latitude = log_mega->u.gps.latitude;
+						ao_gps_static.longitude = log_mega->u.gps.longitude;
+						{
+							int16_t	altitude_low = log_mega->u.gps.altitude_low;
+							int16_t altitude_high = log_mega->u.gps.altitude_high;
+							int32_t altitude = altitude_low | ((int32_t) altitude_high << 16);
+
+							AO_TELEMETRY_LOCATION_SET_ALTITUDE(&ao_gps_static, altitude);
+						}
+						ao_gps_static.flags = log_mega->u.gps.flags;
+						if (!ao_gps_count)
+							ao_gps_first = ao_gps_static;
+						ao_gps_count++;
+						break;
+					case AO_LOG_GPS_SAT:
+						break;
+					}
+					break;
+#endif
+#ifdef foo_TELEMEGA_V4
+				case AO_LOG_FORMAT_TELEMEGA_4:
+					log_mega = (struct ao_log_mega *) &eeprom->data[eeprom_offset];
+					eeprom_offset += sizeof (*log_mega);
+					switch (log_mega->type) {
+					case AO_LOG_FLIGHT:
+						ao_flight_number = log_mega->u.flight.flight;
+						ao_flight_ground_accel = log_mega->u.flight.ground_accel;
+						ao_flight_started = 1;
+						break;
+					case AO_LOG_SENSOR:
+						ao_data_static.tick = log_mega->tick;
+						ao_data_static.adxl375.AO_ADXL375_AXIS = log_mega->u.sensor.accel;
+						ao_records_read++;
+						ao_insert();
+						return;
 					}
 					break;
 #endif

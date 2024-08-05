@@ -19,7 +19,9 @@
 #ifndef _AO_CONFIG_H_
 #define _AO_CONFIG_H_
 
+#ifndef AO_FLIGHT_TEST
 #include <ao.h>
+#endif
 
 #if AO_PYRO_NUM
 #include <ao_pyro.h>

@@ -38,6 +38,8 @@ static uint8_t		ao_lco_channels[AO_PAD_MAX_BOXES];	/* pad channels available on 
 static uint16_t		ao_lco_tick_offset[AO_PAD_MAX_BOXES];	/* 16 bit offset from local to remote tick count */
 static uint8_t		ao_lco_selected[AO_PAD_MAX_BOXES];	/* pads selected to fire */
 
+static uint32_t		ao_lco_query_good, ao_lco_query_bad;
+
 uint8_t		ao_lco_valid[AO_PAD_MAX_BOXES];		/* AO_LCO_VALID bits per box */
 
 static const AO_LED_TYPE	continuity_led[AO_LED_CONTINUITY_NUM] = {
@@ -171,9 +173,14 @@ ao_lco_get_channels(int16_t box, struct ao_pad_query *query)
 	if (r == AO_RADIO_CMAC_OK) {
 		ao_lco_channels[box] = query->channels;
 		ao_lco_valid[box] = AO_LCO_VALID_LAST | AO_LCO_VALID_EVER;
-	} else
+		++ao_lco_query_good;
+	} else {
 		ao_lco_valid[box] &= (uint8_t) ~AO_LCO_VALID_LAST;
-	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d offset %d\n", box, ao_radio_cmac_rssi, ao_lco_valid[box], r, ao_lco_tick_offset[box]);
+		++ao_lco_query_bad;
+	}
+	PRINTD("ao_lco_get_channels(%d) rssi %d valid %d ret %d offset %d good %"PRIu32" bad %"PRIu32"\n",
+	       box, ao_radio_cmac_rssi, ao_lco_valid[box], r, ao_lco_tick_offset[box],
+	       ao_lco_query_good, ao_lco_query_bad);
 	ao_wakeup(&ao_pad_query);
 	return ao_lco_valid[box];
 }
@@ -193,9 +200,9 @@ ao_lco_update(void)
 			if (!ao_lco_pad_pseudo(ao_lco_pad))
 				ao_lco_set_pad(ao_lco_pad_first(ao_lco_box));
 		}
-		if (ao_lco_pad_pseudo(ao_lco_pad))
-			ao_lco_show();
 	}
+	if (ao_lco_pad_pseudo(ao_lco_pad))
+		ao_lco_show();
 }
 
 uint8_t	ao_lco_box_mask[AO_LCO_MASK_SIZE(AO_PAD_MAX_BOXES)];
@@ -266,7 +273,7 @@ ao_lco_step_pad(int8_t dir)
 		break;
 	}
 #endif
-#ifdef AO_LCO_HAS_BACKLIGHT
+#ifdef AO_LCO_HAS_BACKLIGHT_UI
 	case AO_LCO_BACKLIGHT: {
 		int32_t backlight = ao_lco_get_backlight();
 
@@ -282,8 +289,8 @@ ao_lco_step_pad(int8_t dir)
 		break;
 	}
 #endif
-#ifdef AO_LCO_HAS_INFO
-	case AO_LCO_INFO: {
+#if AO_LCO_HAS_LCO_INFO
+	case AO_LCO_LCO_INFO: {
 #if AO_LCO_MIN_INFO_PAGE < AO_LCO_MAX_INFO_PAGE
 		int32_t info_page = ao_lco_get_info_page();
 

@@ -83,6 +83,7 @@ distclean:	clean
 
 clean:
 	rm -f *.o $(PROGNAME)-*.elf $(PROGNAME)-*.ihx $(PROGNAME)-*.map
+	rm -f $(PROGNAME)-*.dfu
 	rm -f ao_product.h
 
 install:

@@ -84,16 +84,32 @@ CFLAGS = $(PRODUCT_DEF) $(STM32F1_CFLAGS)
 PROGNAME=easymega-v3.0
 PROG=$(PROGNAME)-$(VERSION).elf
 HEX=$(PROGNAME)-$(VERSION).ihx
+FLASH_PROG=flash-loader/$(PROGNAME)-altos-flash-$(VERSION).elf
+BOTH_DFU=$(PROGNAME)-combined-$(VERSION).dfu
+BOTH_HEX=$(PROGNAME)-combined-$(VERSION).ihx
+ELFTOHEX=$(TOPDIR)/../ao-tools/ao-elftohex/ao-elftohex
+MAKEBIN=$(TOPDIR)/../ao-tools/ao-makebin/ao-makebin
 
 SRC=$(ALTOS_SRC) ao_easymega.c
 OBJ=$(SRC:.c=.o)
 
-all: $(PROG) $(HEX)
+all: $(PROG) $(HEX) $(BOTH_DFU) $(BOTH_HEX)
 
 $(PROG): Makefile $(OBJ) altos.ld
 	$(call quiet,CC) $(LDFLAGS) -o $(PROG) $(OBJ) $(LIBS)
 
+$(BOTH_DFU): $(PROG) $(FLASH_PROG)
+	$(MAKEBIN) --dfu --output=$@ --base=$(FLASH_ADDR) $(FLASH_PROG) $(PROG)
+
+$(BOTH_HEX): $(PROG) $(FLASH_PROG)
+	$(ELFTOHEX) --nosym --output=$@ $(FLASH_PROG) $(PROG)
+
+$(FLASH_PROG): FRC
+	+cd flash-loader && make
+
 $(OBJ): $(INC)
+
+FRC:
 
 distclean:	clean
 

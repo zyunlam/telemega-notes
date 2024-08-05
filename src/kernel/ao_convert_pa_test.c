@@ -18,6 +18,7 @@
 
 #include <stdint.h>
 #define AO_CONVERT_TEST
+#define AO_TICK_TYPE uint32_t
 typedef int32_t alt_t;
 typedef int32_t pres_t;
 #include "ao_host.h"

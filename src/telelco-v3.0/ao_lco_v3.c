@@ -24,6 +24,7 @@
 #include <ao_st7565.h>
 #include <ao_adc_single.h>
 #include <ao_pwm.h>
+#include <limits.h>
 
 #define WIDTH	AO_ST7565_WIDTH
 #define HEIGHT	AO_ST7565_HEIGHT
@@ -40,8 +41,8 @@ static struct ao_bitmap fb = {
 };
 
 static const struct ao_transform logo_transform = {
-	.x_scale = 48, .x_off = 2,
-	.y_scale = 48, .y_off = 0,
+	.x_scale = 40, .x_off = 8,
+	.y_scale = 40, .y_off = 0,
 };
 
 static const struct ao_transform show_transform = {
@@ -53,7 +54,7 @@ static const struct ao_transform show_transform = {
 #define VOLT_FONT BitstreamVeraSans_Roman_58_font
 #define SMALL_FONT BitstreamVeraSans_Roman_12_font
 #define TINY_FONT BitstreamVeraSans_Roman_10_font
-#define LOGO_FONT BenguiatGothicStd_Bold_26_font
+#define LOGO_FONT BenguiatGothicStd_Bold_24_font
 
 #define LABEL_Y		(int16_t) (SMALL_FONT.ascent)
 #define VALUE_Y		(int16_t) (LABEL_Y + 5 + BIG_FONT.ascent)
@@ -70,6 +71,8 @@ static const struct ao_transform show_transform = {
 #define SCAN_X		(WIDTH - 100) / 2
 #define SCAN_Y		50
 #define SCAN_HEIGHT	3
+#define SCANNING_X	(WIDTH / 2)
+#define SCANNING_Y	(SCAN_Y - 2)
 #define FOUND_Y		63
 #define FOUND_X		3
 #define FOUND_WIDTH	(WIDTH - 6)
@@ -87,8 +90,9 @@ static const struct ao_transform show_transform = {
 #define BACKLIGHT_HEIGHT	20
 #define BACKLIGHT_VALUE_X	64
 #define BACKLIGHT_VALUE_Y	(BACKLIGHT_Y + BACKLIGHT_HEIGHT + SMALL_FONT.ascent + 3)
-#define INFO_START_Y	((int16_t) (SMALL_FONT.ascent + 2))
-#define INFO_STEP_Y	((int16_t) (SMALL_FONT.ascent + 3))
+#define INFO_FONT	TINY_FONT
+#define INFO_START_Y	((int16_t) (INFO_FONT.ascent + 2))
+#define INFO_STEP_Y	((int16_t) (INFO_FONT.ascent + 2))
 
 #define AO_LCO_DRAG_RACE_START_TIME	AO_SEC_TO_TICKS(5)
 #define AO_LCO_DRAG_RACE_STOP_TIME	AO_SEC_TO_TICKS(2)
@@ -102,6 +106,9 @@ static uint8_t	ao_lco_event_debug;
 #define AO_LCO_SELECT_PAD	1
 
 static uint8_t	ao_lco_display_mutex;
+
+static uint8_t		ao_sample_data;
+static struct ao_data	ao_data_cur;
 
 static void
 _ao_center_text(int16_t x, int16_t y, const struct ao_font *font, const char *str)
@@ -131,28 +138,12 @@ _ao_lco_show_box(int16_t box)
 }
 
 static void
-_ao_lco_show_voltage(uint16_t decivolts, const char *label)
+_ao_format_voltage(char *str, size_t size, uint16_t decivolts)
 {
-	char	str[7];
-
-	PRINTD("voltage %d\n", decivolts);
-	_ao_center_text(WIDTH/2, LABEL_Y, &SMALL_FONT, label);
-	snprintf(str, sizeof(str), "%d.%d", decivolts / 10, decivolts % 10);
-	_ao_center_text(WIDTH/2, VALUE_Y, &BIG_FONT, str);
+	snprintf(str, size, "%d.%d", decivolts / 10, decivolts % 10);
 }
 
-static void
-_ao_lco_batt_voltage(void)
-{
-	struct ao_adc	packet;
-	int16_t		decivolt;
-
-	ao_adc_single_get(&packet);
-	decivolt = ao_battery_decivolt(packet.v_batt);
-	_ao_lco_show_voltage((uint16_t) decivolt, "LCO Battery");
-	ao_st7565_update(&fb);
-}
-
+#if AO_LCO_HAS_CONTRAST
 static void
 _ao_lco_show_contrast(void)
 {
@@ -165,7 +156,9 @@ _ao_lco_show_contrast(void)
 	snprintf(buf, sizeof(buf), "%d %%", brightness * 100 / AO_LCO_MAX_CONTRAST);
 	_ao_center_text(WIDTH/2, CONTRAST_VALUE_Y, &SMALL_FONT, buf);
 }
+#endif
 
+#if AO_LCO_HAS_BACKLIGHT_UI
 static void
 _ao_lco_show_backlight(void)
 {
@@ -178,6 +171,7 @@ _ao_lco_show_backlight(void)
 	snprintf(buf, sizeof(buf), "%ld %%", backlight * 100 / AO_LCO_MAX_BACKLIGHT);
 	_ao_center_text(WIDTH/2, BACKLIGHT_VALUE_Y, &SMALL_FONT, buf);
 }
+#endif
 
 static int16_t info_y;
 
@@ -189,46 +183,141 @@ _ao_lco_info(const char *format, ...)
 	va_start(a, format);
 	vsnprintf(buf, sizeof(buf), format, a);
 	va_end(a);
-	ao_text(&fb, &SMALL_FONT, 0, info_y, buf, AO_BLACK, AO_COPY);
+	ao_text(&fb, &INFO_FONT, 0, info_y, buf, AO_BLACK, AO_COPY);
 	info_y += INFO_STEP_Y;
 }
 
 static void
-_ao_lco_show_info(void)
+_ao_lco_show_lco_info(void)
 {
-	info_y = INFO_START_Y;
+	char		battery[7];
+	int16_t		decivolt;
+
 	ao_logo_poly(&fb, &show_transform, AO_BLACK, AO_COPY);
+
+	decivolt = ao_battery_decivolt(ao_data_cur.adc.v_batt);
+	_ao_format_voltage(battery, sizeof(battery), (uint16_t) decivolt);
+
+	info_y = INFO_START_Y;
 	_ao_lco_info("%s", ao_product);
-	_ao_lco_info("Version: %s", ao_version);
 	_ao_lco_info("Serial: %d", ao_serial_number);
+	_ao_lco_info("Battery: %sV", battery);
+	_ao_lco_info("Version: %s", ao_version);
 	_ao_lco_info("Callsign: %s", ao_config.callsign);
 	_ao_lco_info("Frequency: %ld.%03d",
 		     ao_config.frequency / 1000,
 		     (int) (ao_config.frequency % 1000));
 }
 
-static void
-_ao_lco_show_rssi(void)
+static uint8_t
+popcount(uint32_t value)
 {
-	char label[20];
-	int16_t width;
-	snprintf(label, sizeof(label), "Bank %d RSSI", ao_lco_box);
-	width = ao_text_width(&SMALL_FONT, label);
-	ao_text(&fb, &SMALL_FONT, VALUE_LABEL_X - width / 2, LABEL_Y, label, AO_BLACK, AO_COPY);
-	if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST))
-		strcpy(label, "---");
-	else
-		snprintf(label, sizeof(label), "%d", ao_radio_cmac_rssi);
-	width = ao_text_width(&VOLT_FONT, label);
-	ao_text(&fb, &VOLT_FONT, VALUE_LABEL_X - width / 2, VALUE_Y, label, AO_BLACK, AO_COPY);
+	uint8_t count = 0;
+	while(value != 0) {
+		count += value & 1;
+		value >>= 1;
+	}
+	return count;
 }
 
 static void
-_ao_lco_show_pad_battery(void)
+_ao_lco_show_pad_info(void)
 {
-	char label[20];
-	snprintf(label, sizeof(label), "Bank %d Battery", ao_lco_box);
-	_ao_lco_show_voltage(ao_pad_query.battery, label);
+	char	pad_battery[7];
+
+	ao_logo_poly(&fb, &show_transform, AO_BLACK, AO_COPY);
+	info_y = INFO_START_Y;
+	_ao_lco_info("Bank: %d", ao_lco_box);
+	if (!(ao_lco_valid[ao_lco_box] & AO_LCO_VALID_LAST)) {
+		_ao_lco_info("Contact lost");
+		_ao_lco_info("Last RSSI: %ddBm", ao_radio_cmac_last_rssi);
+	} else {
+		_ao_lco_info("Total pads: %d", popcount(ao_pad_query.channels));
+		_ao_lco_info("RSSI: %ddBm", ao_radio_cmac_rssi);
+		_ao_format_voltage(pad_battery, sizeof(pad_battery), ao_pad_query.battery);
+		_ao_lco_info("Battery: %sV", pad_battery);
+		_ao_lco_info("Arming switch: %s", ao_pad_query.arm_status ? "On" : "Off");
+	}
+}
+
+#define AO_LCO_DIM_BACKLIGHT	(AO_LCO_MIN_BACKLIGHT + 3 * AO_LCO_BACKLIGHT_STEP)
+#define AO_AUTO_BACKLIGHT_RANGE	(AO_LCO_MAX_BACKLIGHT - AO_LCO_DIM_BACKLIGHT)
+#define AO_AUTO_BACKLIGHT_GAP	AO_ADC_MAX / 6
+
+static struct {
+	int16_t	v_als;
+	int32_t	backlight;
+} ao_lco_backlight_map[] = {
+	{ .v_als = AO_ADC_MAX / 6, .backlight = AO_LCO_DIM_BACKLIGHT },
+	{ .v_als = AO_ADC_MAX / 3, .backlight = (AO_LCO_MAX_BACKLIGHT - AO_LCO_MIN_BACKLIGHT) / 2 },
+	{ .v_als = AO_ADC_MAX / 2, .backlight = AO_LCO_MAX_BACKLIGHT },
+	{ .v_als = AO_ADC_MAX * 3 / 4,	.backlight = 0 },
+};
+
+#define NUM_BACKLIGHT_MAP sizeof(ao_lco_backlight_map)/sizeof(ao_lco_backlight_map[0])
+
+static unsigned ao_backlight_prev = NUM_BACKLIGHT_MAP - 1;
+
+static void
+ao_auto_backlight(int16_t als_min, int16_t als_max)
+{
+	unsigned ao_backlight;
+
+	PRINTD("ao_auto_backlight min %d max %d\n", als_min, als_max);
+	ao_backlight = ao_backlight_prev;
+	while (als_min > ao_lco_backlight_map[ao_backlight].v_als + AO_AUTO_BACKLIGHT_GAP) {
+		if (ao_backlight == NUM_BACKLIGHT_MAP - 1)
+			break;
+		ao_backlight++;
+	}
+	while (als_max < ao_lco_backlight_map[ao_backlight].v_als - AO_AUTO_BACKLIGHT_GAP) {
+		if (ao_backlight == 0)
+			return;
+		ao_backlight--;
+	}
+	if (ao_backlight != ao_backlight_prev)
+	{
+		PRINTD("   set backlight to %ld\n", ao_lco_backlight_map[ao_backlight].backlight);
+		ao_lco_set_backlight(ao_lco_backlight_map[ao_backlight].backlight);
+		ao_backlight_prev = ao_backlight;
+	}
+}
+
+#define AO_LCO_BACKLIGHT_INTERVAL	AO_SEC_TO_TICKS(2)
+
+static void
+ao_lco_data(void)
+{
+	AO_TICK_TYPE	backlight_tick = ao_time() + AO_LCO_BACKLIGHT_INTERVAL;
+	AO_TICK_TYPE	now;
+	int16_t		als_min = INT16_MAX;
+	int16_t		als_max = INT16_MIN;
+
+	ao_timer_set_adc_interval(AO_MS_TO_TICKS(100));
+	for (;;) {
+		ao_sleep((void *) &ao_data_head);
+
+		while (ao_sample_data != ao_data_head) {
+			struct ao_data *ao_data;
+
+			/* Capture a sample */
+			ao_data = (struct ao_data *) &ao_data_ring[ao_sample_data];
+
+			ao_data_cur = *ao_data;
+			if (ao_data_cur.adc.v_als < als_min)
+				als_min = ao_data_cur.adc.v_als;
+			if (ao_data_cur.adc.v_als > als_max)
+				als_max = ao_data_cur.adc.v_als;
+			ao_sample_data = ao_data_ring_next(ao_sample_data);
+		}
+		now = ao_time();
+		if ((AO_TICK_SIGNED) (backlight_tick - now) < 0) {
+			backlight_tick = now + AO_LCO_BACKLIGHT_INTERVAL;
+			ao_auto_backlight(als_min, als_max);
+			als_min = INT16_MAX;
+			als_max = INT16_MIN;
+		}
+	}
 }
 
 void
@@ -237,25 +326,23 @@ ao_lco_show(void)
 	ao_mutex_get(&ao_lco_display_mutex);
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	switch (ao_lco_box) {
-	case AO_LCO_LCO_VOLTAGE:
-		_ao_lco_batt_voltage();
-		break;
+#if AO_LCO_HAS_CONTRAST
 	case AO_LCO_CONTRAST:
 		_ao_lco_show_contrast();
 		break;
+#endif
+#if AO_LCO_HAS_BACKLIGHT_UI
 	case AO_LCO_BACKLIGHT:
 		_ao_lco_show_backlight();
 		break;
-	case AO_LCO_INFO:
-		_ao_lco_show_info();
+#endif
+	case AO_LCO_LCO_INFO:
+		_ao_lco_show_lco_info();
 		break;
 	default:
 		switch (ao_lco_pad) {
-		case AO_LCO_PAD_RSSI:
-			_ao_lco_show_rssi();
-			break;
-		case AO_LCO_PAD_VOLTAGE:
-			_ao_lco_show_pad_battery();
+		case AO_LCO_PAD_INFO:
+			_ao_lco_show_pad_info();
 			break;
 		default:
 			_ao_lco_show_pad(ao_lco_pad);
@@ -291,6 +378,7 @@ ao_lco_set_select(void)
 }
 
 
+#if AO_LCO_HAS_CONTRAST
 void
 ao_lco_set_contrast(int32_t contrast)
 {
@@ -302,7 +390,9 @@ ao_lco_get_contrast(void)
 {
 	return (int32_t) ao_st7565_get_brightness();
 }
+#endif
 
+#if AO_LCO_HAS_BACKLIGHT
 static uint16_t ao_backlight;
 
 void
@@ -317,6 +407,7 @@ ao_lco_get_backlight(void)
 {
 	return (int32_t) ao_backlight;
 }
+#endif
 
 static struct ao_task	ao_lco_drag_task;
 
@@ -413,12 +504,13 @@ ao_lco_display_test(void)
 	ao_led_on(AO_LEDS_AVAILABLE);
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_BLACK, AO_COPY);
 	ao_st7565_update(&fb);
-	ao_delay(AO_MS_TO_TICKS(250));
+	ao_delay(AO_MS_TO_TICKS(1000));
 	ao_led_off(AO_LEDS_AVAILABLE);
 }
 
 static struct ao_task ao_lco_input_task;
 static struct ao_task ao_lco_monitor_task;
+static struct ao_task ao_lco_data_task;
 static struct ao_task ao_lco_arm_warn_task;
 static struct ao_task ao_lco_igniter_status_task;
 
@@ -432,6 +524,7 @@ ao_lco_search_start(void)
 {
 	ao_rect(&fb, 0, 0, WIDTH, HEIGHT, AO_WHITE, AO_COPY);
 	ao_logo(&fb, &logo_transform, &LOGO_FONT, AO_BLACK, AO_COPY);
+	_ao_center_text(SCANNING_X, SCANNING_Y, &TINY_FONT, "Scanning...");
 	found_width = 0;
 	nfound = 0;
 }
@@ -515,6 +608,7 @@ void
 ao_lco_init(void)
 {
 	ao_add_task(&ao_lco_monitor_task, ao_lco_main, "lco monitor");
+	ao_add_task(&ao_lco_data_task, ao_lco_data, "lco data");
 #if DEBUG
 	ao_cmd_register(&ao_lco_cmds[0]);
 #endif

@@ -24,7 +24,7 @@
 #define AO_CMAC_KEY_LEN		AO_AES_LEN
 #define AO_CMAC_MAX_LEN		(128 - AO_CMAC_KEY_LEN)
 
-extern int8_t ao_radio_cmac_rssi;
+extern int8_t ao_radio_cmac_rssi, ao_radio_cmac_last_rssi;
 
 int8_t
 ao_radio_cmac_send(void *packet, uint8_t len);
