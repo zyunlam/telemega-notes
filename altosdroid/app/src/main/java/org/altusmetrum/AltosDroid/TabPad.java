@@ -18,6 +18,8 @@
 
 package org.altusmetrum.AltosDroid;
 
+import java.util.*;
+
 import org.altusmetrum.altoslib_14.*;
 
 import android.os.Bundle;
@@ -213,7 +215,7 @@ public class TabPad extends AltosDroidTab {
 			if (state.gps != null) {
 				int soln = state.gps.nsat;
 				int nsat = state.gps.cc_gps_sat != null ? state.gps.cc_gps_sat.length : 0;
-				gps_locked_view.setText(String.format("%d in soln, %d in view", soln, nsat));
+				gps_locked_view.setText(String.format(Locale.getDefault(), "%d in soln, %d in view", soln, nsat));
 				gps_locked_lights.set(state.gps.locked && state.gps.nsat >= 4, false);
 				if (state.gps_ready)
 					gps_ready_view.setText("Ready");

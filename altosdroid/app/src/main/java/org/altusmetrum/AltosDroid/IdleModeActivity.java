@@ -18,6 +18,7 @@
 
 package org.altusmetrum.AltosDroid;
 
+import java.util.*;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -87,7 +88,7 @@ public class IdleModeActivity extends Activity {
 
 		frequency = getIntent().getDoubleExtra(AltosDroid.EXTRA_FREQUENCY, 0.0);
 		frequencyView = (TextView) findViewById(R.id.frequency);
-		frequencyView.setText(String.format("Frequency: %7.3f MHz", frequency));
+		frequencyView.setText(String.format(Locale.getDefault(), "Frequency: %7.3f MHz", frequency));
 
 		connect = (Button) findViewById(R.id.connect_idle);
 		connect.setOnClickListener(new OnClickListener() {

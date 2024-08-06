@@ -276,10 +276,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		switch (telemetry_state.connect) {
 		case TelemetryState.CONNECT_CONNECTED:
 			if (telemetry_state.config != null) {
-				String str = String.format("S/N %d %6.3f MHz%s", telemetry_state.config.serial,
+				String str = String.format(Locale.getDefault(), "S/N %d %6.3f MHz%s", telemetry_state.config.serial,
 							   telemetry_state.frequency, telemetry_state.idle_mode ? " (idle)" : "");
 				if (telemetry_state.telemetry_rate != AltosLib.ao_telemetry_rate_38400)
-					str = str.concat(String.format(" %d bps",
+					str = str.concat(String.format(Locale.getDefault(), " %d bps",
 								       AltosLib.ao_telemetry_rate_values[telemetry_state.telemetry_rate]));
 				setTitle(str);
 			} else {
@@ -288,7 +288,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			break;
 		case TelemetryState.CONNECT_CONNECTING:
 			if (telemetry_state.address != null)
-				setTitle(String.format("Connecting to %s...", telemetry_state.address.name));
+				setTitle(String.format(Locale.getDefault(), "Connecting to %s...", telemetry_state.address.name));
 			else
 				setTitle("Connecting to something...");
 			break;
@@ -423,13 +423,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 	static String age_string(int age) {
 		String	text;
 		if (age < 60)
-			text = String.format("%ds", age);
+			text = String.format(Locale.getDefault(), "%ds", age);
 		else if (age < 60 * 60)
-			text = String.format("%dm", age / 60);
+			text = String.format(Locale.getDefault(), "%dm", age / 60);
 		else if (age < 60 * 60 * 24)
-			text = String.format("%dh", age / (60 * 60));
+			text = String.format(Locale.getDefault(), "%dh", age / (60 * 60));
 		else
-			text = String.format("%dd", age / (24 * 60 * 60));
+			text = String.format(Locale.getDefault(), "%dd", age / (24 * 60 * 60));
 		return text;
 	}
 
@@ -522,13 +522,13 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				if (state.cal_data().serial == AltosLib.MISSING)
 					mSerialView.setText("");
 				else
-					mSerialView.setText(String.format("%d", state.cal_data().serial));
+					mSerialView.setText(String.format(Locale.getDefault(), "%d", state.cal_data().serial));
 			}
 			if (saved_state == null || state.cal_data().flight != saved_state.flight) {
 				if (state.cal_data().flight == AltosLib.MISSING)
 					mFlightView.setText("");
 				else
-					mFlightView.setText(String.format("%d", state.cal_data().flight));
+					mFlightView.setText(String.format(Locale.getDefault(), "%d", state.cal_data().flight));
 			}
 			if (saved_state == null || state.state() != saved_state.state) {
 				if (state.state() == AltosLib.ao_flight_stateless) {
@@ -542,7 +542,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 				if (state.rssi == AltosLib.MISSING)
 					mRSSIView.setText("");
 				else
-					mRSSIView.setText(String.format("%d", state.rssi));
+					mRSSIView.setText(String.format(Locale.getDefault(), "%d", state.rssi));
 			}
 			saved_state = new SavedState(state);
 		}
@@ -575,19 +575,19 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		}
 		int deg = (int) Math.floor(p);
 		double min = (p - Math.floor(p)) * 60.0;
-		return String.format("%d° %7.4f\" %s", deg, min, h);
+		return String.format(Locale.getDefault(), "%d° %7.4f\" %s", deg, min, h);
 	}
 
 	static String number(String format, double value) {
 		if (value == AltosLib.MISSING)
 			return "";
-		return String.format(format, value);
+		return String.format(Locale.getDefault(), format, value);
 	}
 
 	static String integer(String format, int value) {
 		if (value == AltosLib.MISSING)
 			return "";
-		return String.format(format, value);
+		return String.format(Locale.getDefault(), format, value);
 	}
 
 	private View create_tab_view(String label) {
@@ -779,7 +779,7 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 			try {
 				locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
 				location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-			} catch (Exception e) {
+			} catch (SecurityException e) {
 				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
 				location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 			}
@@ -1328,9 +1328,9 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 		else if (iheading < -179 || 179 < iheading)
 			return "backwards";
 		else if (iheading < 0)
-			return String.format("left %d°", -iheading);
+			return String.format(Locale.getDefault(), "left %d°", -iheading);
 		else
-			return String.format("right %d°", iheading);
+			return String.format(Locale.getDefault(), "right %d°", iheading);
 	}
 
 	public void onLocationChanged(Location location) {

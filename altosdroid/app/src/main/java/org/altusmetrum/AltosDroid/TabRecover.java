@@ -18,6 +18,7 @@
 
 package org.altusmetrum.AltosDroid;
 
+import java.util.*;
 import org.altusmetrum.altoslib_14.*;
 
 import android.os.Bundle;
@@ -61,7 +62,7 @@ public class TabRecover extends AltosDroidTab {
 
 	public void show(TelemetryState telem_state, AltosState state, AltosGreatCircle from_receiver, Location receiver) {
 		if (from_receiver != null) {
-			mBearingView.setText(String.format("%1.0f°", from_receiver.bearing));
+			mBearingView.setText(String.format(Locale.getDefault(), "%1.0f°", from_receiver.bearing));
 			set_value(mDistanceView, AltosConvert.distance, 1, from_receiver.distance);
 			String direction = AltosDroid.direction(from_receiver, receiver);
 			if (direction == null)

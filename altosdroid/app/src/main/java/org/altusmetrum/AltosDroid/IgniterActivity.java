@@ -275,8 +275,8 @@ public class IgniterActivity extends Activity {
 		set_igniter(status, "drogue", "Apogee");
 		set_igniter(status, "main", "Main");
 		for (int extra = 0;; extra++) {
-			String	name = String.format("%d", extra);
-			String	pretty = String.format("%c", 'A' + extra);
+			String	name = String.format(Locale.getDefault(), "%d", extra);
+			String	pretty = String.format(Locale.getDefault(), "%c", 'A' + extra);
 			if (!set_igniter(status, name, pretty))
 				break;
 		}
@@ -291,7 +291,7 @@ public class IgniterActivity extends Activity {
 	}
 
 	private void arm_set_text() {
-		String	text = String.format("Armed %d", arm_remaining);
+		String	text = String.format(Locale.getDefault(), "Armed %d", arm_remaining);
 
 		if (arm.isChecked())
 			arm.setText(text);

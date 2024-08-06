@@ -62,9 +62,9 @@ public class Tracker implements CharSequence, Comparable, Parcelable {
 		if (frequency == 0.0)
 			display = "Auto";
 		else if (frequency == AltosLib.MISSING) {
-			display = String.format("%-8.8s  %6d", call, serial);
+			display = String.format(Locale.getDefault(), "%-8.8s  %6d", call, serial);
 		} else {
-			display = String.format("%-8.8s %7.3f %6d", call, frequency, serial);
+			display = String.format(Locale.getDefault(), "%-8.8s %7.3f %6d", call, frequency, serial);
 		}
 	}
 

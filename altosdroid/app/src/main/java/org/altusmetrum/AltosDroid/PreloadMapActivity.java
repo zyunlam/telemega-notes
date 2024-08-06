@@ -134,8 +134,8 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 			if (selected_item != null)
 				known_sites_spinner.setSelection(known_sites_adapter.getPosition(selected_item));
 			else {
-				latitude.setText(new StringBuffer(String.format("%12.6f", current_location_site.latitude)));
-				longitude.setText(new StringBuffer(String.format("%12.6f", current_location_site.longitude)));
+				latitude.setText(new StringBuffer(String.format(Locale.getDefault(), "%12.6f", current_location_site.latitude)));
+				longitude.setText(new StringBuffer(String.format(Locale.getDefault(), "%12.6f", current_location_site.longitude)));
 			}
 		} else {
 			current_location_site.latitude = location.getLatitude();
@@ -279,8 +279,8 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 	class SiteListListener implements OnItemSelectedListener {
 		public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
 			AltosLaunchSite	site = (AltosLaunchSite) parent.getItemAtPosition(pos);
-			latitude.setText(new StringBuffer(String.format("%12.6f", site.latitude)));
-			longitude.setText(new StringBuffer(String.format("%12.6f", site.longitude)));
+			latitude.setText(new StringBuffer(String.format(Locale.getDefault(), "%12.6f", site.latitude)));
+			longitude.setText(new StringBuffer(String.format(Locale.getDefault(), "%12.6f", site.longitude)));
 		}
 		public void onNothingSelected(AdapterView<?> parent) {
 		}
@@ -358,8 +358,11 @@ public class PreloadMapActivity extends Activity implements AltosLaunchSiteListe
 		LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 		try {
 			locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
-		} catch (Exception e) {
-			locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+		} catch (SecurityException e) {
+			try {
+				locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+			} catch (SecurityException se) {
+			}
 		}
 
 		new AltosLaunchSites(this);

@@ -31,7 +31,6 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	public final static String        NAME    = "org.altusmetrum.AltosDroid";
 	private Context                   context = null;
 	private SharedPreferences         prefs   = null;
-	private SharedPreferences.Editor  editor  = null;
 
 	public AltosDroidPreferencesBackend(Context in_context) {
 		this(in_context, NAME);
@@ -40,7 +39,6 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	public AltosDroidPreferencesBackend(Context in_context, String in_prefs) {
 		context = in_context;
 		prefs   = context.getSharedPreferences(in_prefs, 0);
-		editor  = prefs.edit();
 	}
 
 	public String[] keys() {
@@ -104,37 +102,48 @@ public class AltosDroidPreferencesBackend extends AltosPreferencesBackend {
 	}
 
 	public void putBoolean(String key, boolean value) {
+		SharedPreferences.Editor editor = prefs.edit();
 		editor.putBoolean(key, value);
+		editor.apply();
 	}
 
 	public void putDouble(String key, double value) {
+		SharedPreferences.Editor editor = prefs.edit();
 		editor.putFloat(key, (float)value);
+		editor.apply();
 	}
 
 	public void putInt(String key, int value) {
+		SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt(key, value);
+		editor.apply();
 	}
 
 	public void putString(String key, String value) {
+		SharedPreferences.Editor editor = prefs.edit();
 //		AltosDebug.debug("AltosDroidPreferencesBackend put string %s:\n", key);
 //		String[] lines = value.split("\n");
 //		for (String l : lines)
 //			AltosDebug.debug("        %s\n", l);
 		editor.putString(key, value);
+		editor.apply();
 	}
 
 	public void putBytes(String key, byte[] bytes) {
+		SharedPreferences.Editor editor = prefs.edit();
 		String save = Base64.encodeToString(bytes, Base64.DEFAULT);
 		editor.putString(key, save);
+		editor.apply();
 	}
 
 	public void remove(String key) {
+		SharedPreferences.Editor editor = prefs.edit();
 		AltosDebug.debug("remove preference %s\n", key);
 		editor.remove(key);
+		editor.apply();
 	}
 
 	public void flush() {
-		editor.apply();
 	}
 
 	public File homeDirectory() {

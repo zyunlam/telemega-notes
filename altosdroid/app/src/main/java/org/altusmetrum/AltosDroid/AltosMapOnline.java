@@ -90,7 +90,7 @@ class RocketOnline implements Comparable {
 
 	RocketOnline(Context context, int serial, GoogleMap map, double lat, double lon, long last_packet) {
 		this.serial = serial;
-		String name = String.format("%d", serial);
+		String name = String.format(Locale.ROOT, "%d", serial);
 		this.marker = map.addMarker(new MarkerOptions()
 					    .icon(BitmapDescriptorFactory.fromBitmap(rocket_bitmap(context, name)))
 					    .position(new LatLng(lat, lon))
@@ -207,8 +207,12 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 
 	void
 	position_permission() {
-		if (mMap != null)
-			mMap.setMyLocationEnabled(true);
+		if (mMap != null) {
+			try {
+				mMap.setMyLocationEnabled(true);
+			} catch (SecurityException e) {
+			}
+		}
 	}
 
 	@Override
@@ -218,7 +222,7 @@ public class AltosMapOnline implements AltosDroidMapInterface, GoogleMap.OnMarke
 		if (mMap != null) {
 			map_type_changed(map_type);
 			if (altos_droid.have_location_permission)
-				mMap.setMyLocationEnabled(true);
+				position_permission();
 			else
 				altos_droid.tell_map_permission(this);
 			mMap.getUiSettings().setTiltGesturesEnabled(false);

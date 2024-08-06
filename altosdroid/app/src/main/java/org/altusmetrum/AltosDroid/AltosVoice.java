@@ -19,6 +19,7 @@
 
 package org.altusmetrum.AltosDroid;
 
+import java.util.*;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.location.Location;
@@ -90,7 +91,7 @@ public class AltosVoice {
 	}
 
 	public synchronized void speak(String format, Object ... arguments) {
-		speak(String.format(format, arguments));
+		speak(String.format(Locale.getDefault(), format, arguments));
 	}
 
 	public synchronized boolean is_speaking() {
@@ -269,7 +270,7 @@ public class AltosVoice {
 
 		String direction = AltosDroid.direction(from_receiver, receiver);
 		if (direction == null)
-			direction = String.format("Bearing %d", (int) (from_receiver.bearing + 0.5));
+			direction = String.format(Locale.getDefault(), "Bearing %d", (int) (from_receiver.bearing + 0.5));
 
 		speak("%s, distance %s.", direction,
 		      AltosConvert.distance.say_units(from_receiver.distance));

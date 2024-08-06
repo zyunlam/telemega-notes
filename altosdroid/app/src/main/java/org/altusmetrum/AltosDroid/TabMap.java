@@ -18,6 +18,8 @@
 
 package org.altusmetrum.AltosDroid;
 
+import java.util.*;
+
 import org.altusmetrum.altoslib_14.*;
 
 import android.app.Activity;
@@ -95,7 +97,7 @@ public class TabMap extends AltosDroidTab implements AltosDroidMapSourceListener
 				mBearingView.setText(direction);
 			} else {
 				mBearingLabel.setText("Bearing");
-				mBearingView.setText(String.format("%3.0f°", from_receiver.bearing));
+				mBearingView.setText(String.format(Locale.getDefault(), "%3.0f°", from_receiver.bearing));
 			}
 			set_value(mDistanceView, AltosConvert.distance, 6, from_receiver.distance);
 		} else {

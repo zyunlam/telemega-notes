@@ -195,13 +195,13 @@ public class SelectTrackerActivity extends Activity implements OnTouchListener {
 		if (tracker.serial == 0)
 			((TextView) row.findViewById(R.id.serial_view)).setText("");
 		else
-			((TextView) row.findViewById(R.id.serial_view)).setText(String.format("%d", tracker.serial));
+			((TextView) row.findViewById(R.id.serial_view)).setText(String.format(Locale.getDefault(), "%d", tracker.serial));
 		if (tracker.frequency == 0.0)
 			((TextView) row.findViewById(R.id.frequency_view)).setText("");
 		else if (tracker.frequency == AltosLib.MISSING)
 			((TextView) row.findViewById(R.id.frequency_view)).setText("");
 		else
-			((TextView) row.findViewById(R.id.frequency_view)).setText(String.format("%7.3f", tracker.frequency));
+			((TextView) row.findViewById(R.id.frequency_view)).setText(String.format(Locale.getDefault(), "%7.3f", tracker.frequency));
 		if (tracker.received_time != 0) {
 			int age = (int) ((start_time - tracker.received_time + 500) / 1000);
 			((TextView) row.findViewById(R.id.age_view)).setText(AltosDroid.age_string(age));

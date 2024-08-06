@@ -70,7 +70,7 @@ class Rocket implements Comparable {
 
 	Rocket(int serial, AltosMapOffline map_offline) {
 		this.serial = serial;
-		this.name = String.format("%d", serial);
+		this.name = String.format(Locale.ROOT, "%d", serial);
 		this.map_offline = map_offline;
 	}
 }
