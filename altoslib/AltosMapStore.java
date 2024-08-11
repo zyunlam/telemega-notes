@@ -131,20 +131,15 @@ public class AltosMapStore {
 				}
 				InputStream in = new BufferedInputStream(uc.getInputStream());
 				int bytesRead = 0;
-				int offset = 0;
-				data = new byte[contentLength];
-				while (offset < contentLength) {
-					bytesRead = in.read(data, offset, data.length - offset);
-					if (bytesRead == -1)
-						break;
-					offset += bytesRead;
+				byte[] buffer = new byte[4096];
+				ByteArrayOutputStream baos = new ByteArrayOutputStream();
+				while ((bytesRead = in.read(buffer)) != -1) {
+					baos.write(buffer, 0, bytesRead);
 				}
 				in.close();
+				data = baos.toByteArray();
 
-				if (offset == contentLength)
-					status = AltosMapTile.fetched;
-				else
-					status = AltosMapTile.failed;
+				status = AltosMapTile.fetched;
 
 			} catch (IOException e) {
 				status = AltosMapTile.failed;
