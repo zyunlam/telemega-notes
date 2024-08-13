@@ -20,18 +20,11 @@
 #include <ao_exti.h>
 #include <ao_profile.h>
 #include <ao_eeprom.h>
-#if HAS_STACK_GUARD
-#include <ao_mpu.h>
-#endif
 
 int
 main(void)
 {
 	ao_clock_init();
-
-#if HAS_STACK_GUARD
-	ao_mpu_init();
-#endif
 
 	ao_task_init();
 	ao_serial_init();
@@ -47,12 +40,9 @@ main(void)
 	ao_usb_init();
 
 	ao_config_init();
-#if AO_PROFILE
-	ao_profile_init();
-#endif
-#if HAS_SAMPLE_PROFILE
-	ao_sample_profile_init();
-#endif
+
+	/* signal we're alive */
+	ao_beep_for(AO_BEEP_MID, AO_MS_TO_TICKS(200));
 
 	ao_start_scheduler();
 

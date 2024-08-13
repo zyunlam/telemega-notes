@@ -22,12 +22,6 @@ INC = \
 # Common AltOS sources
 #
 
-#PROFILE=ao_profile.c
-#PROFILE_DEF=-DAO_PROFILE=1
-
-#STACK_GUARD=ao_mpu_stm.c
-#STACK_GUARD_DEF=-DHAS_STACK_GUARD=1
-
 ALTOS_SRC = \
 	ao_boot_chain.c \
 	ao_interrupt.c \
@@ -49,16 +43,13 @@ ALTOS_SRC = \
 	ao_usb_stm.c \
 	ao_exti_stm.c \
 	ao_report.c \
-	ao_convert_volt.c \
-	$(PROFILE) \
-	$(SAMPLE_PROFILE) \
-	$(STACK_GUARD)
+	ao_convert_volt.c
 
 PRODUCT=EasyCamera-v1
 PRODUCT_DEF=-DEASYCAMERA
 IDPRODUCT=0x000a
 
-CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS) $(PROFILE_DEF) $(SAMPLE_PROFILE_DEF) $(STACK_GUARD_DEF)
+CFLAGS = $(PRODUCT_DEF) $(STM_CFLAGS)
 
 PROGNAME=easycamera-v1
 PROG=$(PROGNAME)-$(VERSION).elf
