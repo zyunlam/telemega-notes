@@ -19,7 +19,7 @@
 #ifndef _AO_PINS_H_
 #define _AO_PINS_H_
 
-/* External crystal at 16MHz */
+/* External crystal at 32MHz */
 #define AO_HSE		32000000
 #define AO_RCC_CFGR_PLLMUL	(STM_RCC_CFGR_PLLMUL_3)
 #define AO_RCC_CFGR_PLLDIV	(STM_RCC_CFGR_PLLDIV_3)
