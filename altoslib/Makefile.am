@@ -118,6 +118,7 @@ altoslib_JAVA = \
 	AltosSensorTGPS1.java \
 	AltosSensorTGPS2.java \
 	AltosSensorTGPS3.java \
+	AltosSensorTGPS4.java \
 	AltosSensorEasyMotor2.java \
 	AltosState.java \
 	AltosStateName.java \
