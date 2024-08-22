@@ -48,7 +48,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|0	|uint16_t	|serial	|Device serial Number
 		|2	|uint16_t	|tick	|Device time in 100ths of a second
 		|4	|uint8_t	|type	|Packet type
-		|5
+		|5	|	|	|
 		|====
 
 		Each packet starts with these five bytes which serve to identify
@@ -93,7 +93,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|26	|int16_t	|ground_accel	|TM
 		|28	|int16_t	|accel_plus_g	|TM
 		|30	|int16_t	|accel_minus_g	|TM
-		|32
+		|32	|	|	|
 		|====
 
 	=== TeleMega Sensor Data
@@ -152,7 +152,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|26	|int16_t	|mag_x		|X field strength (across)
 		|28	|int16_t	|mag_y		|Y field strength (along)
 		|30	|int16_t	|mag_z		|Z field strength (through)
-		|32
+		|32	|	|	|
 		|====
 
 		.TeleMega Kalman and Voltage Data Packet Contents
@@ -170,7 +170,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|26	|int16_t	|acceleration	|m/s² * 16
 		|28	|int16_t	|speed		|m/s * 16
 		|30	|int16_t	|height		|m
-		|32
+		|32	|	|	|
 		|====
 
 	=== TeleMetrum v2 and newer Sensor Data
@@ -208,7 +208,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|22	|int16_t	|sense_d	|drogue continuity sense
 		|24	|int16_t	|sense_m	|main continuity sense
 		|26	|pad[6]		|pad bytes	|
-		|32
+		|32	|	|	|
 		|====
 
 		.TeleMetrum v2 and newer Calibration Data Packet Contents
@@ -221,7 +221,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|14	|int16_t	|accel_plus_g	|Accel calibration at +1g
 		|16	|int16_t	|accel_minus_g	|Accel calibration at -1g
 		|18	|pad[14]	|pad bytes	|
-		|32
+		|32	|	|	|
 		|====
 
 	=== TeleMini v3.0 Sensor Data
@@ -255,7 +255,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|22	|int16_t	|height		|m
 		|24	|int16_t	|ground_pres	|Average barometer reading on ground
 		|28	|pad[4]		|pad bytes	|
-		|32
+		|32	|	|	|
 		|====
 
 
@@ -287,7 +287,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|14	|uint16_t	|flight_log_max	|Maximum flight log size (kB)
 		|16	|char		|callsign[8]	|Radio operator identifier
 		|24	|char		|version[8]	|Software version identifier
-		|32
+		|32	|	|	|
 		|====
 
 	=== GPS Location
@@ -328,7 +328,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|28	|int16_t	|climb_rate	|cm/s
 		|30	|uint8_t	|course		|/ 2
 		|31	|uint8_t	|unused[1]	|
-		|32
+		|32	|	|	|
 		|====
 
 		Packed into a one byte field are status flags and the
@@ -405,7 +405,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|5	|uint8_t	|channels	|Number of reported satellite information
 		|6	|sat_info_t	|sats[12]	|See Per-Satellite data table below
 		|30	|uint8_t	|unused[2]	|
-		|32
+		|32	|	|	|
 		|====
 
 		.GPS Per-Satellite data (sat_info_t)
@@ -414,7 +414,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|Offset	|Data Type	|Name		|Description
 		|0	|uint8_t	|svid		|Space Vehicle Identifier
 		|1	|uint8_t	|c_n_1		|C/N1 signal quality indicator
-		|2
+		|2	|	|	|
 		|====
 
 	=== Companion Data
@@ -444,7 +444,7 @@ Keith Packard <keithp@keithp.com>; Bdale Garbee <bdale@gag.com>
 		|6	|uint8_t	|update_period	|How often telemetry is sent, in 1/100ths of a second
 		|7	|uint8_t	|channels	|Number of data channels supplied
 		|8	|uint16_t[12]	|companion_data	|Up to 12 channels of 16-bit companion data
-		|32
+		|32	|	|	|
 		|====
 
 == Data Transmission
