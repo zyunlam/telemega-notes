@@ -33,7 +33,7 @@ ao_report(void)
 			flush();
 			c = ao_up_getchar();
 		}
-		putchar(c);
+		putchar((char) c);
 	}
 }
 
