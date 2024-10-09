@@ -505,8 +505,10 @@ public class AltosDroid extends FragmentActivity implements AltosUnitsListener, 
 
 			if (location != null && state.gps != null && state.gps.locked) {
 				double altitude = 0;
-				if (location.hasAltitude())
+				if (location.hasAltitude()) {
 					altitude = location.getAltitude();
+					state.set_gps_ground_altitude(altitude);
+				}
 				from_receiver = new AltosGreatCircle(location.getLatitude(),
 								     location.getLongitude(),
 								     altitude,
