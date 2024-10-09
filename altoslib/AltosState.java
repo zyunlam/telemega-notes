@@ -820,18 +820,17 @@ public class AltosState extends AltosDataListener {
 
 		if (gps.locked && gps.nsat >= 4) {
 			/* Track consecutive 'good' gps reports, waiting for 10 of them */
-			if (state() == AltosLib.ao_flight_pad || state() == AltosLib.ao_flight_stateless) {
+			if (state() == AltosLib.ao_flight_pad) {
 				set_npad(npad+1);
-				if (pad_lat != AltosLib.MISSING && (npad < 10 || state() == AltosLib.ao_flight_pad)) {
+				if (pad_lat != AltosLib.MISSING) {
 					pad_lat = (pad_lat * 31 + gps.lat) / 32;
 					pad_lon = (pad_lon * 31 + gps.lon) / 32;
 					gps_ground_altitude.set_filtered(gps.alt, time);
+				} else {
+					pad_lat = gps.lat;
+					pad_lon = gps.lon;
+					gps_ground_altitude.set(gps.alt, time);
 				}
-			}
-			if (pad_lat == AltosLib.MISSING) {
-				pad_lat = gps.lat;
-				pad_lon = gps.lon;
-				gps_ground_altitude.set(gps.alt, time);
 			}
 			gps_altitude.set(gps.alt, time);
 			if (gps.climb_rate != AltosLib.MISSING)
